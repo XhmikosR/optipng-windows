@@ -1,0 +1,16 @@
+/.vs/
+/Tmp/
+/Debug/
+/Release/
+/src/gifread/test/compass.gifdump.out
+/src/libpng/pnglibconf.h
+/src/optipng/pngtest.out.png
+/src/optipng/test/bitset_test.out
+/src/optipng/test/ratio_test.out
+*.lib
+*.obj
+*.exe
+*.pdb
+*.dll
+*.exp
+*.res
