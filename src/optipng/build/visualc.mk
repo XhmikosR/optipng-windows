@@ -5,11 +5,11 @@
 # Usage: nmake -f build\visualc.mk
 
 CC = cl -nologo
-CFLAGS = -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -MD -O2 -W4
+CFLAGS = -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -MT -O2 -MP -GL -W3
 CPP = cl -nologo -E
 CPPFLAGS =
 LD = link -nologo
-LDFLAGS =
+LDFLAGS = -opt:ref -opt:icf -ltcg -RELEASE
 MKDIR_P = mkdir
 CP_FP = copy
 RM_F = del /q
@@ -17,7 +17,7 @@ RM_F = del /q
 LIB_LIBPNG =
 LIB_ZLIB =
 LIBM =
-LIBS =
+LIBS = setargv.obj
 ALL_LIBS = $(LIB_LIBPNG) $(LIB_ZLIB) $(LIBM) $(LIBS)
 
 OPTIPNG_DIR = ..\..\src\optipng
