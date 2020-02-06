@@ -16,9 +16,9 @@ CC = cl
 LD = link
 AR = lib
 CPPFLAGS = -I..\zlib
-CFLAGS  = -nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -MD -O2 -W3
-LDFLAGS = -nologo
-ARFLAGS = -nologo
+CFLAGS  = -nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -MT -O2 -MP -GL -W3
+LDFLAGS = -nologo -opt:ref -opt:icf -ltcg -RELEASE
+ARFLAGS = -nologo -ltcg
 CP = copy
 RM = del
 
