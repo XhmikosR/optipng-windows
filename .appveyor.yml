@@ -1,0 +1,15 @@
+image:
+  - Visual Studio 2019
+
+version: "{build}"
+
+shallow_clone: true
+
+build: off
+
+test_script:
+  - call "build.bat"
+
+artifacts:
+  - path: src\optipng\optipng.exe
+    name: optipng
