@@ -10,7 +10,7 @@ if not exist "%VS_PATH%" echo ERROR: Visual Studio 2019 NOT FOUND! & goto end
 call "%VS_PATH%\Common7\Tools\vsdevcmd" -arch=amd64
 
 nmake /f build\visualc.mk
-rem nmake -f build\visualc.mk test
+if defined CI nmake -f build\visualc.mk test
 
 :end
 endlocal
