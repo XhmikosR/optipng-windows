@@ -10,7 +10,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       actions: read
       contents: read
@@ -28,10 +28,12 @@ jobs:
           languages: "cpp"
           queries: security-extended,security-and-quality
 
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v1
+
       - name: Build
-        run: |
-         ./configure
-         make
+        run: CALL "build.bat"
+        shell: cmd
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
