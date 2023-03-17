@@ -17,8 +17,10 @@ jobs:
       security-events: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       # Initializes the CodeQL tools for scanning
       - name: Initialize CodeQL
