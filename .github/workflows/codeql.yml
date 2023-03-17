@@ -22,11 +22,11 @@ jobs:
         with:
           persist-credentials: false
 
-      # Initializes the CodeQL tools for scanning
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: "cpp"
+          queries: security-extended,security-and-quality
 
       - name: Build
         run: |
@@ -35,3 +35,5 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:cpp"
