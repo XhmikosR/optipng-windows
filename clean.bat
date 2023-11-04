@@ -8,7 +8,6 @@ pushd src
 for %%G in (
   "gifread"
   "gifread\test\"
-  "libpng"
   "minitiff"
   "minitiff\test\"
   "opngreduc"
@@ -16,6 +15,15 @@ for %%G in (
   "optipng\test\"
   "pngxtern"
   "pnmio"
+) do call :clean %%G
+
+popd
+
+pushd third_party
+
+for %%G in (
+  "cexcept"
+  "libpng"
   "zlib"
 ) do call :clean %%G
 
