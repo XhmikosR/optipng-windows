@@ -17,7 +17,7 @@ RM_F = del /q
 LIB_LIBPNG =
 LIB_ZLIB =
 LIBM =
-LIBS = setargv.obj
+#LIBS = setargv.obj
 ALL_LIBS = $(LIB_LIBPNG) $(LIB_ZLIB) $(LIBM) $(LIBS)
 
 OPTIPNG_DIR = ..\..\src\optipng
