@@ -20,28 +20,28 @@ LIBM =
 LIBS = #noeh32.lib
 ALL_LIBS = $(LIB_LIBPNG) $(LIB_ZLIB) $(LIBM) $(LIBS)
 
-OPTIPNG_DIR = ..\optipng
-CEXCEPT_DIR = ..\cexcept
-OPNGREDUC_DIR = ..\opngreduc
+OPTIPNG_DIR = ..\..\src\optipng
+CEXCEPT_DIR = ..\..\third_party\cexcept
+OPNGREDUC_DIR = ..\..\src\opngreduc
 OPNGREDUC_LIB = opngreduc.lib
 OPNGREDUC_MK = build\bcc32.mk
-PNGXTERN_DIR = ..\pngxtern
+PNGXTERN_DIR = ..\..\src\pngxtern
 PNGXTERN_LIB = pngxtern.lib
 PNGXTERN_MK = build\bcc32.mk
-LIBPNG_DIR = ..\libpng
+LIBPNG_DIR = ..\..\third_party\libpng
 LIBPNG_LIB = libpng.lib
 LIBPNG_MK = scripts\makefile.bc32
 LIBPNG_MK_DEF = PNGLIBCONF_H_PREBUILT=pnglibconf.h.optipng
-ZLIB_DIR = ..\zlib
+ZLIB_DIR = ..\..\third_party\zlib
 ZLIB_LIB = zlib.lib
 ZLIB_MK = win32\Makefile.bor
-GIF_DIR = ..\gifread
+GIF_DIR = ..\..\src\gifread
 GIF_LIB = gifread.lib
 GIF_MK = build\bcc32.mk
-PNM_DIR = ..\pnmio
+PNM_DIR = ..\..\src\pnmio
 PNM_LIB = pnmio.lib
 PNM_MK = build\bcc32.mk
-TIFF_DIR = ..\minitiff
+TIFF_DIR = ..\..\src\minitiff
 TIFF_LIB = minitiff.lib
 TIFF_MK = build\bcc32.mk
 

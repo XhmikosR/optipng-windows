@@ -2,7 +2,7 @@
  * ioutil.h
  * I/O utilities.
  *
- * Copyright (C) 2003-2017 Cosmin Truta and the Contributing Authors.
+ * Copyright (C) 2003-2023 Cosmin Truta and the Contributing Authors.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -192,15 +192,6 @@ int
 opng_os_rename(const char *src_path, const char *dest_path, int clobber);
 
 /*
- * Copies the attributes (access mode, time stamp, etc.) of a file system
- * object.
- * On success, the function returns 0.
- * On error, it returns -1.
- */
-int
-opng_os_copy_attr(const char *src_path, const char *dest_path);
-
-/*
  * Creates a new directory.
  * If the directory is successfully created, or if it already exists,
  * the function returns 0.
@@ -210,13 +201,21 @@ int
 opng_os_create_dir(const char *dirname);
 
 /*
+ * Copies the attributes (access mode, time stamp, etc.) of a file system
+ * object.
+ * On success, the function returns 0.
+ * On error, it returns -1.
+ */
+int
+opng_os_copy_file_attr(const char *src_path, const char *dest_path);
+
+/*
  * Determines if the accessibility of the specified file system object
  * satisfies the specified access mode. The access mode consists of one
  * or more characters that indicate the checks to be performed, as follows:
  *   'e': the path exists; it needs not be a regular file.
  *   'f': the path exists and is a regular file.
  *   'r': the path exists and read permission is granted.
- *   'w': the path exists and write permission is granted.
  *   'x': the path exists and execute permission is granted.
  * For example, to determine if a file can be opened for reading using
  * fopen(), use "fr" in the access mode.
@@ -224,7 +223,7 @@ opng_os_create_dir(const char *dirname);
  * Otherwise, it returns -1.
  */
 int
-opng_os_test(const char *path, const char *mode);
+opng_os_test_file_access(const char *path, const char *mode);
 
 /*
  * Determines if two accessible paths are equivalent, i.e. they
@@ -235,12 +234,13 @@ opng_os_test(const char *path, const char *mode);
  * if the check cannot be performed, the function returns -1.
  */
 int
-opng_os_test_eq(const char *path1, const char *path2);
+opng_os_test_file_equiv(const char *path1, const char *path2);
 
 /*
  * Removes a directory entry.
  * On success, the function returns 0.
  * On error, it returns -1.
+ *   'w': the path exists and write permission is granted.
  */
 int
 opng_os_unlink(const char *path);

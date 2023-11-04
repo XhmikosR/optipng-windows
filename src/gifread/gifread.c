@@ -2,7 +2,7 @@
  * gifread.c
  * A simple GIF reader.
  *
- * Copyright (C) 2003-2017 Cosmin Truta.
+ * Copyright (C) 2003-2023 Cosmin Truta and the Contributing Authors.
  * This software was derived from "giftopnm.c" by David Koblas,
  * and is distributed under the same copyright and warranty terms.
  *
@@ -361,6 +361,12 @@ static int LZWGetCode(int code_size, int init_flag, FILE *stream)
         last_byte = 2 + count;
         curbit = (curbit - lastbit) + 16;
         lastbit = (2 + count) * 8;
+    }
+
+    if (code_size && (size_t)(curbit + code_size - 1) / 8 >= sizeof(buffer))
+    {
+        /* TODO: Move this error prevention to an earlier decoding stage. */
+        GIFError("Malformed GIF (CVE-2023-43907)");
     }
 
     ret = 0;

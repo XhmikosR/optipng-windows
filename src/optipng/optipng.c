@@ -2,7 +2,7 @@
  * OptiPNG: Advanced PNG optimization program.
  * http://optipng.sourceforge.net/
  *
- * Copyright (C) 2001-2017 Cosmin Truta and the Contributing Authors.
+ * Copyright (C) 2001-2018 Cosmin Truta and the Contributing Authors.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -18,6 +18,9 @@
  * from the pngrewrite program by Jason Summers.
  */
 
+#include "optipng.h"
+#include "proginfo.h"
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -25,13 +28,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "optipng.h"
-#include "proginfo.h"
+#include <png.h>
+#include <pngxutil.h>
+#include <zlib.h>
 
 #include "bitset.h"
-#include "png.h"
-#include "pngxutil.h"
-#include "zlib.h"
 
 
 static const char *msg_intro =
@@ -197,7 +198,7 @@ opng_strcasecmp(const char *str1, const char *str2)
         ch2 = tolower(*str2++);
         if (ch1 != ch2)
             return ch1 - ch2;
-        if (ch1 == 0)
+        if (ch1 == '\0')
             return 0;
     }
     /* FIXME: This function is not MBCS-aware. */
@@ -238,7 +239,7 @@ opng_strpbrk_digit(const char *str)
 {
     for ( ; ; )
     {
-        if (*str == 0)
+        if (*str == '\0')
             return NULL;
         if (isdigit(*str))
             return (char *)str;
@@ -306,7 +307,7 @@ opng_str2ulong(unsigned long *out_val, const char *in_str,
     }
 
     /* Check for trailing garbage. */
-    if (*opng_strltrim(end_ptr) != 0)
+    if (*opng_strltrim(end_ptr) != '\0')
     {
         errno = EINVAL;  /* garbage in input */
         return -1;
@@ -321,7 +322,7 @@ static void
 err_option_arg(const char *opt, const char *opt_arg)
 {
     /* Issue an error regarding the incorrect value of the option argument. */
-    if (opt_arg == NULL || *opng_strltrim(opt_arg) == 0)
+    if (opt_arg == NULL || *opng_strltrim(opt_arg) == '\0')
         error("Missing argument for option %s", opt);
     else
         error("Invalid argument for option %s: %s", opt, opt_arg);
@@ -412,7 +413,7 @@ check_obj_option(const char *opt, const char *opt_arg)
               (opt_arg[i] >= 'a' && opt_arg[i] <= 'z')))
             break;
     }
-    if (i == 4 && opt_arg[i] == 0)
+    if (i == 4 && opt_arg[i] == '\0')
         error("Manipulation of individual chunks is not implemented");
     else
         err_option_arg(opt, opt_arg);
@@ -429,7 +430,7 @@ scan_option(const char *str,
     unsigned int opt_len;
 
     /* Check if arg is an "-option". */
-    if (str[0] != '-' || str[1] == 0)  /* no "-option", or just "-" */
+    if (str[0] != '-' || str[1] == '\0')  /* no "-option", or just "-" */
         return 0;
 
     /* Extract the normalized option, and possibly the option argument. */
@@ -437,7 +438,7 @@ scan_option(const char *str,
     ptr = str + 1;
     while (*ptr == '-')  /* "--option", "---option", etc. */
         ++ptr;
-    if (*ptr == 0)  /* "--" */
+    if (*ptr == '\0')  /* "--" */
         --ptr;
     for ( ; ; )
     {
@@ -445,11 +446,11 @@ scan_option(const char *str,
             opt_buf[opt_len] = (char)tolower(*ptr);
         ++opt_len;
         ++ptr;
-        if (*ptr == 0 || isspace(*ptr))  /* "-option" or "-option arg" */
+        if (*ptr == '\0' || isspace(*ptr))  /* "-option" or "-option arg" */
         {
             while (isspace(*ptr))
                 ++ptr;
-            *opt_arg_ptr = (*ptr != 0) ? ptr : NULL;
+            *opt_arg_ptr = (*ptr != '\0') ? ptr : NULL;
             break;
         }
         if (*ptr == '=')  /* "-option=arg" */
@@ -715,7 +716,7 @@ parse_args(int argc, char *argv[])
             /* -ou PATH | -out PATH */
             if (options.out_name != NULL)
                 error("Multiple output file names are not permitted");
-            if (xopt[0] == 0)
+            if (xopt[0] == '\0')
                 err_option_arg("-out", NULL);
             options.out_name = xopt;
         }
@@ -724,7 +725,7 @@ parse_args(int argc, char *argv[])
             /* -d PATH | ... | -dir PATH */
             if (options.dir_name != NULL)
                 error("Multiple output dir names are not permitted");
-            if (xopt[0] == 0)
+            if (xopt[0] == '\0')
                 err_option_arg("-dir", NULL);
             options.dir_name = xopt;
         }
@@ -733,7 +734,7 @@ parse_args(int argc, char *argv[])
             /* -l PATH | ... | -log PATH */
             if (options.log_name != NULL)
                 error("Multiple log file names are not permitted");
-            if (xopt[0] == 0)
+            if (xopt[0] == '\0')
                 err_option_arg("-log", NULL);
             options.log_name = xopt;
         }
@@ -775,7 +776,7 @@ app_printf(const char *fmt, ...)
 {
     va_list arg_ptr;
 
-    if (fmt[0] == 0)
+    if (fmt[0] == '\0')
         return;
     start_of_line = (fmt[strlen(fmt) - 1] == '\n') ? 1 : 0;
 
@@ -921,7 +922,7 @@ process_files(int argc, char *argv[])
     result = EXIT_SUCCESS;
     for (i = 1; i < argc; ++i)
     {
-        if (argv[i] == NULL || argv[i][0] == 0)
+        if (argv[i] == NULL || argv[i][0] == '\0')
             continue;  /* this was an "-option" */
         if (opng_optimize(argv[i]) != 0)
             result = EXIT_FAILURE;

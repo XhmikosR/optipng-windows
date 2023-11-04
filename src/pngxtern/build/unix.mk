@@ -19,8 +19,7 @@ ARFLAGS = cru
 RANLIB = ranlib
 RM_F = rm -f
 
-ZDIR = ../zlib
-PNGDIR = ../libpng
+PNGDIR = ../../third_party/libpng
 GIFDIR = ../gifread
 PNMDIR = ../pnmio
 TIFFDIR = ../minitiff
@@ -31,12 +30,9 @@ PNGXREAD_OBJS = pngxread.o pngxrbmp.o pngxrgif.o pngxrjpg.o pngxrpnm.o pngxrtif.
 PNGXUTIL_OBJS = pngxio.o pngxmem.o pngxset.o
 PNGXTERN_OBJS = $(PNGXREAD_OBJS) $(PNGXUTIL_OBJS)
 
-PNGXTERN_DEPINCLUDE_ZLIB = -I$(ZDIR)
-#PNGXTERN_DEPINCLUDE_ZLIB =
 PNGXTERN_DEPINCLUDE_LIBPNG = -I$(PNGDIR)
 #PNGXTERN_DEPINCLUDE_LIBPNG =
 PNGXTERN_DEPINCLUDES = \
-  $(PNGXTERN_DEPINCLUDE_ZLIB) \
   $(PNGXTERN_DEPINCLUDE_LIBPNG) \
   -I$(GIFDIR) \
   -I$(PNMDIR) \

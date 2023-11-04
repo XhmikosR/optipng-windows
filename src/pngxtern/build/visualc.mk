@@ -14,8 +14,7 @@ AR = lib -nologo
 ARFLAGS =
 RM_F = del /q
 
-ZDIR = ..\zlib
-PNGDIR = ..\libpng
+PNGDIR = ..\..\third_party\libpng
 GIFDIR = ..\gifread
 PNMDIR = ..\pnmio
 TIFFDIR = ..\minitiff
@@ -26,10 +25,8 @@ PNGXREAD_OBJS = pngxread.obj pngxrbmp.obj pngxrgif.obj pngxrjpg.obj pngxrpnm.obj
 PNGXUTIL_OBJS = pngxio.obj pngxmem.obj pngxset.obj
 PNGXTERN_OBJS = $(PNGXREAD_OBJS) $(PNGXUTIL_OBJS)
 
-PNGXTERN_DEPINCLUDE_ZLIB = -I$(ZDIR)
 PNGXTERN_DEPINCLUDE_LIBPNG = -I$(PNGDIR)
 PNGXTERN_DEPINCLUDES = \
-  $(PNGXTERN_DEPINCLUDE_ZLIB) \
   $(PNGXTERN_DEPINCLUDE_LIBPNG) \
   -I$(GIFDIR) \
   -I$(PNMDIR) \

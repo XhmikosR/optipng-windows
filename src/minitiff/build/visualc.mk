@@ -41,7 +41,7 @@ tiffutil.obj: tiffutil.c minitiff.h
 #tiffwrite.obj: tiffwrite.c
 
 test\tiff2pnm.obj: test\tiff2pnm.c minitiff.h
-	$(CC) -c -I. $(CPPFLAGS) $(CFLAGS) -Fo$@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -Fo$@ $*.c
 
 clean:
 	-$(RM_F) $(MINITIFF_LIB) $(MINITIFF_OBJS)

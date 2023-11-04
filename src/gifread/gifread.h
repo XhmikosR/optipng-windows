@@ -4,7 +4,7 @@
  *
  * @copyright
  * <pre>
- * Copyright (C) 2003-2017 Cosmin Truta.
+ * Copyright (C) 2003-2023 Cosmin Truta and the Contributing Authors.
  * This software was derived from "giftopnm.c" by David Koblas,
  * and is distributed under the same copyright and warranty terms.
  * </pre><pre>

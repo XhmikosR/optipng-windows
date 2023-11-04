@@ -2,7 +2,7 @@
  * ioutil.c
  * I/O utilities.
  *
- * Copyright (C) 2003-2017 Cosmin Truta and the Contributing Authors.
+ * Copyright (C) 2003-2023 Cosmin Truta and the Contributing Authors.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -159,15 +159,22 @@
 #endif
 
 #ifdef OPNG_OS_WINDOWS
-#  if defined OPNG_OS_WIN64 || (defined _MSC_VER && _MSC_VER >= 1500)
-#    define OPNG_HAVE_STDIO__I64
-#    define OPNG_OS_WINDOWS_IS_WIN9X() 0
+#  if defined OPNG_OS_WIN64 || \
+      (defined _MSC_VER && _MSC_VER >= 1400) || \
+      defined __MINGW32__ || \
+      defined __clang__ || \
+      defined _UCRT
+#    define OPNG_HAS_STDIO__I64
+#  endif
+#  if defined OPNG_OS_WIN64 || \
+      (defined _MSC_VER && _MSC_VER >= 1500) || \
+      defined __clang__ || \
+      defined _UCRT
+#    define OPNG_OS_WINDOWS_IS_WINNT_ONLY() 1
+#    define OPNG_OS_WINDOWS_IS_WINNT() 1
 #  else
-#    if (defined _MSC_VER && _MSC_VER >= 1400) || \
-        (defined __MSVCRT_VERSION__ && __MSVCRT_VERSION__ >= 0x800)
-#      define OPNG_HAVE_STDIO__I64
-#    endif
-#    define OPNG_OS_WINDOWS_IS_WIN9X() (GetVersion() >= 0x80000000U)
+#    define OPNG_OS_WINDOWS_IS_WINNT_ONLY() 0
+#    define OPNG_OS_WINDOWS_IS_WINNT() (GetVersion() <= 0x7fffffffU)
 #  endif
 #endif
 
@@ -178,7 +185,7 @@
 opng_foffset_t
 opng_ftello(FILE *stream)
 {
-#if defined OPNG_HAVE_STDIO__I64
+#if defined OPNG_OS_WINDOWS && defined OPNG_HAS_STDIO__I64
 
     return (opng_foffset_t)_ftelli64(stream);
 
@@ -203,7 +210,7 @@ opng_ftello(FILE *stream)
 int
 opng_fseeko(FILE *stream, opng_foffset_t offset, int whence)
 {
-#if defined OPNG_HAVE_STDIO__I64
+#if defined OPNG_OS_WINDOWS && defined OPNG_HAS_STDIO__I64
 
     return _fseeki64(stream, (__int64)offset, whence);
 
@@ -279,13 +286,29 @@ opng_fgetsize(FILE *stream, opng_fsize_t *size)
 #if defined OPNG_OS_WINDOWS
 
     HANDLE hFile;
-    DWORD dwSizeLow, dwSizeHigh;
 
     hFile = (HANDLE)_get_osfhandle(_fileno(stream));
-    dwSizeLow = GetFileSize(hFile, &dwSizeHigh);
-    if (GetLastError() != NO_ERROR)
-        return -1;
-    *size = (opng_fsize_t)dwSizeLow + ((opng_fsize_t)dwSizeHigh << 32);
+#if defined OPNG_OS_WIN64 || defined _UCRT
+    {
+        LARGE_INTEGER lSize;
+
+        if (!GetFileSizeEx(hFile, &lSize))
+            return -1;
+        *size = (opng_fsize_t)lSize.QuadPart;
+    }
+#else
+    /* GetFileSizeEx may or may not be available, depending on the
+     * Windows version. Use GetFileSize instead, for maximum portability.
+     */
+    {
+        DWORD dwSizeLow, dwSizeHigh;
+
+        dwSizeLow = GetFileSize(hFile, &dwSizeHigh);
+        if (GetLastError() != NO_ERROR)
+            return -1;
+        *size = (opng_fsize_t)dwSizeLow + ((opng_fsize_t)dwSizeHigh << 32);
+    }
+#endif
     return 0;
 
 #elif defined OPNG_OS_UNIX
@@ -435,10 +458,10 @@ opng_os_rename(const char *src_path, const char *dest_path, int clobber)
 
     DWORD dwFlags;
 
-#if !defined OPNG_OS_WIN64
-    if (OPNG_OS_WINDOWS_IS_WIN9X())
+#if !OPNG_OS_WINDOWS_IS_WINNT_ONLY()
+    if (!OPNG_OS_WINDOWS_IS_WINNT())
     {
-        /* MoveFileEx is not available under Win9X; use MoveFile. */
+        /* MoveFileEx is broken in Win9X; use MoveFile and DeleteFile. */
         if (MoveFileA(src_path, dest_path))
             return 0;
         if (!clobber)
@@ -469,96 +492,6 @@ opng_os_rename(const char *src_path, const char *dest_path, int clobber)
         opng_unlink(dest_path);
     }
     return rename(src_path, dest_path);
-
-#endif
-}
-
-/*
- * Copies the attributes (access mode, time stamp, etc.) of a file system
- * object.
- */
-int
-opng_os_copy_attr(const char *src_path, const char *dest_path)
-{
-#if defined OPNG_OS_WINDOWS
-
-    HANDLE hFile;
-    FILETIME ftLastWrite;
-    BOOL success;
-
-    hFile = CreateFileA(src_path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, 0);
-    if (hFile == INVALID_HANDLE_VALUE)
-        return -1;
-    success = GetFileTime(hFile, NULL, NULL, &ftLastWrite);
-    CloseHandle(hFile);
-    if (!success)
-        return -1;
-
-    hFile = CreateFileA(dest_path, GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
-        (OPNG_OS_WINDOWS_IS_WIN9X() ? 0 : FILE_FLAG_BACKUP_SEMANTICS), 0);
-    if (hFile == INVALID_HANDLE_VALUE)
-        return -1;
-    success = SetFileTime(hFile, NULL, NULL, &ftLastWrite);
-    CloseHandle(hFile);
-    if (!success)
-        return -1;
-
-    /* TODO: Copy the access mode. */
-
-    return 0;
-
-#elif defined OPNG_OS_UNIX || defined OPNG_OS_DOSISH
-
-    struct stat sbuf;
-    int result;
-
-    if (stat(src_path, &sbuf) != 0)
-        return -1;
-
-    result = 0;
-
-    if (chown(dest_path, sbuf.st_uid, sbuf.st_gid) != 0)
-    {
-        /* This is not required to succeed. Fall through. */
-    }
-
-    if (chmod(dest_path, sbuf.st_mode) != 0)
-        result = -1;
-
-#if defined AT_FDCWD && defined UTIME_NOW && defined UTIME_OMIT
-    {
-        struct timespec times[2];
-
-#if defined OPNG_OS_DARWIN
-        times[0] = sbuf.st_atimespec;
-        times[1] = sbuf.st_mtimespec;
-#else
-        times[0] = sbuf.st_atim;
-        times[1] = sbuf.st_mtim;
-#endif
-        if (utimensat(AT_FDCWD, dest_path, times, 0) != 0)
-            result = -1;
-    }
-#else  /* legacy utime */
-    {
-        struct utimbuf utbuf;
-
-        utbuf.actime = sbuf.st_atime;
-        utbuf.modtime = sbuf.st_mtime;
-        if (utime(dest_path, &utbuf) != 0)
-            result = -1;
-    }
-#endif
-
-    return result;
-
-#else  /* generic */
-
-    (void)src_path;  /* unused */
-    (void)dest_path;  /* unused */
-
-    /* Always fail. */
-    return -1;
 
 #endif
 }
@@ -639,11 +572,101 @@ opng_os_create_dir(const char *dirname)
 }
 
 /*
+ * Copies the attributes (access mode, time stamp, etc.) of a file system
+ * object.
+ */
+int
+opng_os_copy_file_attr(const char *src_path, const char *dest_path)
+{
+#if defined OPNG_OS_WINDOWS
+
+    HANDLE hFile;
+    FILETIME ftLastWrite;
+    BOOL success;
+
+    hFile = CreateFileA(src_path, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, 0);
+    if (hFile == INVALID_HANDLE_VALUE)
+        return -1;
+    success = GetFileTime(hFile, NULL, NULL, &ftLastWrite);
+    CloseHandle(hFile);
+    if (!success)
+        return -1;
+
+    hFile = CreateFileA(dest_path, GENERIC_WRITE, 0, NULL, OPEN_EXISTING,
+        (OPNG_OS_WINDOWS_IS_WINNT() ? FILE_FLAG_BACKUP_SEMANTICS : 0), 0);
+    if (hFile == INVALID_HANDLE_VALUE)
+        return -1;
+    success = SetFileTime(hFile, NULL, NULL, &ftLastWrite);
+    CloseHandle(hFile);
+    if (!success)
+        return -1;
+
+    /* TODO: Copy the access mode. */
+
+    return 0;
+
+#elif defined OPNG_OS_UNIX || defined OPNG_OS_DOSISH
+
+    struct stat sbuf;
+    int result;
+
+    if (stat(src_path, &sbuf) != 0)
+        return -1;
+
+    result = 0;
+
+    if (chown(dest_path, sbuf.st_uid, sbuf.st_gid) != 0)
+    {
+        /* This is not required to succeed. Fall through. */
+    }
+
+    if (chmod(dest_path, sbuf.st_mode) != 0)
+        result = -1;
+
+#if defined AT_FDCWD && defined UTIME_NOW && defined UTIME_OMIT
+    {
+        struct timespec times[2];
+
+#if defined OPNG_OS_DARWIN
+        times[0] = sbuf.st_atimespec;
+        times[1] = sbuf.st_mtimespec;
+#else
+        times[0] = sbuf.st_atim;
+        times[1] = sbuf.st_mtim;
+#endif
+        if (utimensat(AT_FDCWD, dest_path, times, 0) != 0)
+            result = -1;
+    }
+#else  /* legacy utime */
+    {
+        struct utimbuf utbuf;
+
+        utbuf.actime = sbuf.st_atime;
+        utbuf.modtime = sbuf.st_mtime;
+        if (utime(dest_path, &utbuf) != 0)
+            result = -1;
+    }
+#endif
+
+    return result;
+
+#else  /* generic */
+
+    (void)src_path;  /* unused */
+    (void)dest_path;  /* unused */
+
+    /* Always fail. */
+    return -1;
+
+#endif
+}
+
+/*
  * Determines if the accessibility of the specified file system object
  * satisfies the specified access mode.
  */
 int
-opng_os_test(const char *path, const char *mode)
+opng_os_test_file_access(const char *path, const char *mode)
 {
     int faccess, freg;
 
@@ -654,8 +677,10 @@ opng_os_test(const char *path, const char *mode)
         faccess |= OPNG_TEST_READ;
     if (strchr(mode, 'w') != NULL)
         faccess |= OPNG_TEST_WRITE;
+#if !defined OPNG_OS_WINDOWS
     if (strchr(mode, 'x') != NULL)
         faccess |= OPNG_TEST_EXEC;
+#endif
     if (faccess == 0 && !freg)
     {
         if (strchr(mode, 'e') == NULL)
@@ -714,7 +739,7 @@ opng_os_test(const char *path, const char *mode)
  * refer to the same file system object.
  */
 int
-opng_os_test_eq(const char *path1, const char *path2)
+opng_os_test_file_equiv(const char *path1, const char *path2)
 {
 #if defined OPNG_OS_WINDOWS
 

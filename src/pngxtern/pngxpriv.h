@@ -12,7 +12,8 @@
 /* This header is not meant to be used outside pngxtern. */
 #ifdef PNGX_INTERNAL
 
-#include "png.h"
+#include <png.h>
+
 #include <stdio.h>
 
 #if defined(PNGX_DEBUG) && (PNGX_DEBUG > 0)

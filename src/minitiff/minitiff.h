@@ -1,9 +1,9 @@
 /*
  * minitiff.h
  * Minimal I/O interface to the Tagged Image File Format (TIFF).
- * Version 0.2 (draft).
+ * Version 0.2.1, 2022-Oct-03.
  *
- * Copyright (C) 2006-2017 Cosmin Truta.
+ * Copyright (C) 2006-2022 Cosmin Truta.
  *
  * minitiff is open-source software, distributed under the zlib license.
  *

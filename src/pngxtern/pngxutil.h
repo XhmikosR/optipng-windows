@@ -9,7 +9,7 @@
 #ifndef PNGXUTIL_H
 #define PNGXUTIL_H
 
-#include "png.h"
+#include <png.h>
 
 
 #ifdef __cplusplus

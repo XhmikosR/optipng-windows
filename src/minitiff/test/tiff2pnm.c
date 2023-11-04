@@ -2,13 +2,13 @@
  * tiff2pnm.c
  * A test program for minitiff.
  *
- * Copyright (C) 2006-2017 Cosmin Truta.
+ * Copyright (C) 2006-2022 Cosmin Truta.
  *
  * minitiff is open-source software, distributed under the zlib license.
  * For conditions of distribution and use, see copyright notice in minitiff.h.
  */
 
-#include "minitiff.h"
+#include "../minitiff.h"
 
 #include <stdio.h>
 #include <stdlib.h>

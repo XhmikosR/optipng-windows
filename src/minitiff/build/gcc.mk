@@ -9,7 +9,7 @@
 .SUFFIXES: .c .o .a
 
 CC = gcc
-CFLAGS = -O2 -Wall -Wextra
+CFLAGS = -O2 -Wall -Wextra -Wundef
 CPP = $(CC) -E
 CPPFLAGS =
 LD = $(CC)
@@ -47,7 +47,7 @@ tiffutil.o: tiffutil.c minitiff.h
 #tiffwrite.o: tiffwrite.c
 
 test/tiff2pnm.o: test/tiff2pnm.c minitiff.h
-	$(CC) -c -I. $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 clean:
 	-$(RM_F) $(MINITIFF_LIB) $(MINITIFF_OBJS)

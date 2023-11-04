@@ -1,7 +1,7 @@
 /*
  * opngreduc.c - libpng extension: lossless image reductions.
  *
- * Copyright (C) 2003-2014 Cosmin Truta.
+ * Copyright (C) 2003-2018 Cosmin Truta.
  * This software is distributed under the same licensing and warranty terms
  * as libpng.
  */
@@ -206,6 +206,12 @@ opng_realloc_PLTE(png_structp png_ptr, png_infop info_ptr, int num_palette)
    png_color buffer[PNG_MAX_PALETTE_LENGTH];
    png_colorp palette;
    int src_num_palette;
+   png_bytep buffer_ptr;
+   png_bytep trans_alpha;
+   int num_trans;
+#ifdef PNG_bKGD_SUPPORTED
+   png_color_16p background;
+#endif
 
    opng_debug(1, "in opng_realloc_PLTE");
 
@@ -216,9 +222,35 @@ opng_realloc_PLTE(png_structp png_ptr, png_infop info_ptr, int num_palette)
       return;
    memcpy(buffer, palette, num_palette * sizeof(png_color));
    if (num_palette > src_num_palette)
+   {
+      /* The new size is larger. Append blank entries. */
       memset(buffer + src_num_palette, 0,
          (num_palette - src_num_palette) * sizeof(png_color));
+   }
    png_set_PLTE(png_ptr, info_ptr, buffer, num_palette);
+
+   /* Postprocess. */
+   if (num_palette < src_num_palette)
+   {
+      /* The new size is smaller. Check the integrity of tRNS and bKGD. */
+      if (png_get_tRNS(png_ptr, info_ptr, &trans_alpha, &num_trans, NULL) &&
+          num_trans > num_palette)
+      {
+         buffer_ptr = (png_bytep)(png_voidp)buffer;
+         png_warning(png_ptr, "Too many alpha values in tRNS");
+         num_trans = num_palette;
+         memcpy(buffer_ptr, trans_alpha, (size_t)num_trans);
+         png_set_tRNS(png_ptr, info_ptr, buffer_ptr, num_trans, NULL);
+      }
+#ifdef PNG_bKGD_SUPPORTED
+      if (png_get_bKGD(png_ptr, info_ptr, &background) &&
+          background->index >= num_palette)
+      {
+         png_warning(png_ptr, "Invalid color index in bKGD");
+         png_set_invalid(png_ptr, info_ptr, PNG_INFO_bKGD);
+      }
+#endif
+   }
 }
 
 /*
@@ -656,6 +688,7 @@ static png_uint_32 /* PRIVATE */
 opng_reduce_palette_bits(png_structp png_ptr, png_infop info_ptr,
    png_uint_32 reductions)
 {
+   png_uint_32 result;
    png_bytepp row_ptr;
    png_bytep src_sample_ptr, dest_sample_ptr;
    png_uint_32 width, height;
@@ -679,9 +712,23 @@ opng_reduce_palette_bits(png_structp png_ptr, png_infop info_ptr,
    if (!png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
       num_palette = 0;
 
+   result = OPNG_REDUCE_NONE;
+
+   /* Check if the palette size is valid. */
+   if (num_palette > (1 << src_bit_depth))
+   {
+      png_warning(png_ptr, "Too many colors in PLTE");
+      /* Fix the palette by trimming out the spurious entries at the end. */
+      num_palette = 1 << src_bit_depth;
+      opng_realloc_PLTE(png_ptr, info_ptr, num_palette);
+      png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette);
+      OPNG_ASSERT(num_palette == (1 << src_bit_depth));
+      result |= OPNG_REDUCE_REPAIR;
+   }
+
    /* Find the smallest possible bit depth. */
    if (num_palette > 16)
-      return OPNG_REDUCE_NONE;
+      return result;
    else if (num_palette > 4)  /* 5 .. 16 entries */
       dest_bit_depth = 4;
    else if (num_palette > 2)  /* 3 or 4 entries */
@@ -695,7 +742,7 @@ opng_reduce_palette_bits(png_structp png_ptr, png_infop info_ptr,
    if (src_bit_depth <= dest_bit_depth)
    {
       OPNG_ASSERT(src_bit_depth == dest_bit_depth);
-      return OPNG_REDUCE_NONE;
+      return result;
    }
 
    /* Iterate through all sample values. */
@@ -762,7 +809,8 @@ opng_reduce_palette_bits(png_structp png_ptr, png_infop info_ptr,
    /* Update the image information. */
    png_set_IHDR(png_ptr, info_ptr, width, height, dest_bit_depth,
       color_type, interlace_type, compression_type, filter_type);
-   return OPNG_REDUCE_8_TO_4_2_1;
+   result |= OPNG_REDUCE_8_TO_4_2_1;
+   return result;
 }
 
 /*
@@ -816,7 +864,8 @@ opng_reduce_to_palette(png_structp png_ptr, png_infop info_ptr,
    num_palette = num_trans = 0;
    trans_color = NULL;
    png_get_tRNS(png_ptr, info_ptr, NULL, NULL, &trans_color);
-   prev_gray = prev_red = prev_green = prev_blue = prev_alpha = 256;
+   prev_gray = prev_red = prev_green = prev_blue = prev_alpha =
+      (unsigned int)(-1);
    for (i = 0; i < height; ++i, ++row_ptr)
    {
       sample_ptr = *row_ptr;
@@ -883,11 +932,19 @@ opng_reduce_to_palette(png_structp png_ptr, png_infop info_ptr,
       }
       else
          red = green = blue = background->gray;
-      opng_insert_palette_entry(palette, &num_palette,
-         trans_alpha, &num_trans, 256,
-         red, green, blue, 256, &index);
-      if (index >= 0)
-         background->index = (png_byte)index;
+      if (red > 255 || green > 255 || blue > 255)
+      {
+         png_warning(png_ptr, "Invalid colors in bKGD");
+         png_set_invalid(png_ptr, info_ptr, PNG_INFO_bKGD);
+      }
+      else
+      {
+         opng_insert_palette_entry(palette, &num_palette,
+            trans_alpha, &num_trans, 256,
+            red, green, blue, (unsigned int)(-1), &index);
+         if (index >= 0)
+            background->index = (png_byte)index;
+      }
    }
 #endif
 

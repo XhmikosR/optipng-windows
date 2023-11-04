@@ -9,7 +9,7 @@
 .SUFFIXES: .c .o .a
 
 CC = clang
-CFLAGS = -O2 -Wall -Wextra
+CFLAGS = -O2 -Wall -Wextra -Wundef
 CPP = $(CC) -E
 CPPFLAGS =
 LD = $(CC)

@@ -2,7 +2,7 @@
  * tiffutil.c
  * General-purpose routines for minitiff.
  *
- * Copyright (C) 2006-2017 Cosmin Truta.
+ * Copyright (C) 2006-2022 Cosmin Truta.
  *
  * minitiff is open-source software, distributed under the zlib license.
  * For conditions of distribution and use, see copyright notice in minitiff.h.
@@ -101,5 +101,5 @@ const char minitiff_sig_i[4] = { 0x49, 0x49, 0x2a, 0x00 };  /* "II*\0" */
 /*
  * Global constants: BigTIFF file signature.
  */
-const char minitiff_sig_bigm[4] = { 0x4d, 0x4d, 0x00, 0x2b };  /* "MM\0*" */
-const char minitiff_sig_bigi[4] = { 0x49, 0x49, 0x2b, 0x00 };  /* "II*\0" */
+const char minitiff_sig_bigm[4] = { 0x4d, 0x4d, 0x00, 0x2b };  /* "MM\0+" */
+const char minitiff_sig_bigi[4] = { 0x49, 0x49, 0x2b, 0x00 };  /* "II+\0" */
