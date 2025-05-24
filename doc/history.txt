@@ -12,6 +12,18 @@ Legend
    (crash, data/metadata loss or security hazard).
  * Other modification (e.g. architectural improvement).
 
+Version 0.7.9   2025-apr-11
+-------------
+ * Upgraded libpng to version 1.6.47.
+ * Upgraded zlib to version 1.3.1-optipng.
+ * Upgraded cexcept to version 2.99-optipng.
+!! Fixed a corner case in the RGB-to-palette reduction code, in which
+   a dangling tRNS chunk (i.e. a tRNS chunk containing an RGB triplet
+   that doesn't actually exist in the RGB-encoded image) should have
+   been discarded (but wasn't); this caused the palette-encoded output
+   image to contain bogus transparency.
+   [Reported by Andrew Dent]
+
 Version 0.7.8   2023-nov-03
 -------------
  * Upgraded libpng to version 1.6.40.

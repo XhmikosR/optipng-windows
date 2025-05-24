@@ -1,15 +1,16 @@
 /*===
-cexcept: example1.c 2.0.0 (2001-Jul-12-Thu)
-Adam M. Costello <amc@cs.berkeley.edu>
+cexcept: example1.c
 
-An example application that demonstrates how to use version 2.0.* of the
-cexcept.h interface.  See README for copyright information.
-
-This application is single-threaded and uses a global exception context.
+An example program that demonstrates how to use the cexcept interface.
+This program is single-threaded and uses a global exception context.
 
 See example2.c for a demonstration of nested Try blocks, avoidance of
 global variables by passing the context in function arguments, and the
 use of a polymorphic exception type.
+
+Use, modification and distribution are subject to the zlib license.
+See the accompanying LICENSE.md file for copyright information, or visit
+https://opensource.org/license/zlib
 
 ===*/
 

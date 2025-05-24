@@ -1,15 +1,15 @@
 /*===
-cexcept: example2.c 2.0.0 (2001-Mar-21-Wed)
-Adam M. Costello <amc@cs.berkeley.edu>
+cexcept: example2.c
 
-An example application that demonstrates how to use version 2.0.* of the
-cexcept.h interface to provide polymorphic exceptions, while avoiding
-the use of global variables.  It also illustrates the use of dynamically
-nested Try blocks.
+An example program that demonstrates how to use the cexcept interface to
+provide polymorphic exceptions while avoiding the use of global variables.
+This program also illustrates the use of dynamically-nested Try blocks.
 
-See README for copyright information.
+See example1.c for a simpler example.
 
-See example.c for a simpler example.
+Use, modification and distribution are subject to the zlib license.
+See the accompanying LICENSE.md file for copyright information, or visit
+https://opensource.org/license/zlib
 
 ===*/
 
@@ -105,6 +105,13 @@ void bar(struct thread_state *state)
     }
   }
 
+  Try {
+    /* nothing to try here */
+  }
+  Catch_anonymous {
+    /* nothing to catch here */
+  }
+
   fprintf(stderr, "return from bar\n");
 }
 
@@ -122,6 +129,7 @@ int main()
     bar(state);  /* exception will be caught by bar(), looks okay to us */
     bar(state);  /* bar() will rethrow the exception */
     fprintf(stderr, "we won't get here\n");
+    /* NOTREACHED */
   }
   Catch (e) {
     switch (e.flavor) {
@@ -131,6 +139,7 @@ int main()
                     break;
       case screwup: fprintf(stderr, "main caught screwup (info == %ld): %s\n",
                             e.info.screwup, e.msg);
+                    /* FALLTHROUGH */
            default: fprintf(stderr, "main caught unknown exception\n");
     }
   }
