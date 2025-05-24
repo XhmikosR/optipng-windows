@@ -1,0 +1,1099 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 10.2.1" />
+<title>OPTIPNG(1)</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overridden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+</head>
+<body class="manpage">
+<div id="header">
+<h1>
+OPTIPNG(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>optipng -
+   optimize Portable Network Graphics (PNG) files
+</p>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>optipng</strong> [&lt;<em>options&#8230;</em>&gt;] [--] &lt;<em>files&#8230;</em>&gt;</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The OptiPNG program shall attempt to <em>optimize</em> PNG files, i.e. to
+reduce their size to a minimum, without losing semantic information.
+In addition, this program shall perform a suite of auxiliary functions
+like integrity checks, metadata recovery and pixmap-to-PNG conversion.</p></div>
+<div class="paragraph"><p>The optimization attempts are not guaranteed to succeed.
+Valid PNG files that cannot be optimized by this program are normally
+left intact; their size will not grow.
+The user may request to override this default behavior.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_files">FILES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The input files are raster image files encoded either in PNG format
+(the native format), or in an external format.
+The currently supported external formats are GIF, BMP, PNM and TIFF.</p></div>
+<div class="paragraph"><p>OptiPNG processes each image file given in the command line as
+follows:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+If the image is in PNG format:
+</p>
+<div class="paragraph"><p>It attempts to optimize the given file in-place.
+If optimization is successful, or if the option <strong>-force</strong> is enabled,
+the original file will be replaced by its optimized version.
+In any case, the original file will be backed up if the option <strong>-keep</strong>
+is enabled.</p></div>
+</li>
+<li>
+<p>
+If the image is in an external format:
+</p>
+<div class="paragraph"><p>It creates an optimized PNG version of the given file.
+The output file name will be constructed using the original file name
+and the <code>.png</code> extension.</p></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Aside from the rules stated above, any existing file is <em>not</em>
+overwritten, unless the option <strong>-clobber</strong> is enabled.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_general_options">General options</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>-?</strong>, <strong>-h</strong>, <strong>-help</strong>
+</dt>
+<dd>
+<p>
+    Show a complete summary of options.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-backup</strong>, <strong>-keep</strong>
+</dt>
+<dd>
+<p>
+    Keep a backup of the modified files.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-clobber</strong>
+</dt>
+<dd>
+<p>
+    Overwrite the existing output and backup files.
+</p>
+<div class="paragraph"><p>Under this option, if the option <strong>-backup</strong> is not enabled, the old
+backups of the overwritten files will be deleted.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-dir</strong> <em>directory</em>
+</dt>
+<dd>
+<p>
+    Write the output files to <em>directory</em>.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-fix</strong>
+</dt>
+<dd>
+<p>
+    Enable error recovery. This option has no effect on valid input
+    files.
+</p>
+<div class="paragraph"><p>The program will spend a reasonable amount of effort to recover as
+much data as possible, without increasing the output file size, but
+the success cannot be generally guaranteed.
+The program may even increase the file size, e.g., by reconstructing
+missing critical data.
+Under this option, integrity shall take precedence over file size.</p></div>
+<div class="paragraph"><p>When this option is not used, the invalid input files are left
+unprocessed.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-force</strong>
+</dt>
+<dd>
+<p>
+    Enforce writing of a new output file.
+</p>
+<div class="paragraph"><p>This option overrides the program&#8217;s decision not to write such file,
+e.g. when the PNG input is digitally signed (using dSIG), or when the
+PNG output becomes larger than the PNG input.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-out</strong> <em>file</em>
+</dt>
+<dd>
+<p>
+    Write output file to <em>file</em>.
+</p>
+<div class="paragraph"><p>The command line must contain exactly one input file.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-preserve</strong>
+</dt>
+<dd>
+<p>
+    Preserve file attributes (time stamps, file access rights, etc.)
+    where applicable.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-quiet</strong>, <strong>-silent</strong>
+</dt>
+<dd>
+<p>
+    Run in quiet mode.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-simulate</strong>
+</dt>
+<dd>
+<p>
+    Run in simulation mode: perform the trials, but do not create
+    output files.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-v</strong>
+</dt>
+<dd>
+<p>
+    Enable the options <strong>-verbose</strong> and <strong>-version</strong>.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-verbose</strong>
+</dt>
+<dd>
+<p>
+    Run in verbose mode.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-version</strong>
+</dt>
+<dd>
+<p>
+    Show the copyright, version and build info.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>--</strong>
+</dt>
+<dd>
+<p>
+    Stop option switch parsing.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_png_encoding_and_optimization_options">PNG encoding and optimization options</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>-o</strong> <em>level</em>
+</dt>
+<dd>
+<p>
+    Select the optimization level.
+</p>
+<div class="paragraph"><p>The optimization level 0 enables a set of optimization operations
+that require minimal effort.
+There will be no changes to image attributes like bit depth or color
+type, and no recompression of existing IDAT datastreams.</p></div>
+<div class="paragraph"><p>The optimization level 1 enables a single IDAT compression trial.
+The trial chosen is what OptiPNG <em>thinks</em> it might be the most
+effective.</p></div>
+<div class="paragraph"><p>The optimization levels 2 and higher enable multiple IDAT compression
+trials; the higher the level, the more trials.</p></div>
+<div class="paragraph"><p>The behavior and the default value of this option may change across
+different program versions.
+Use the option <strong>-h</strong> to see the details pertaining to your specific
+version.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-f</strong> <em>filters</em>
+</dt>
+<dd>
+<p>
+    Select the PNG delta filters.
+</p>
+<div class="paragraph"><p>The <em>filters</em> argument is specified as a rangeset (e.g. <strong>-f0-5</strong>), and
+the default <em>filters</em> value depends on the optimization level set by
+the option <strong>-o</strong>.</p></div>
+<div class="paragraph"><p>The filter values 0, 1, 2, 3 and 4 indicate static filtering, and
+correspond to the standard PNG filter codes
+(<em>None</em>, <em>Left</em>, <em>Up</em>, <em>Average</em> and <em>Paeth</em>, respectively).
+The filter value 5 indicates adaptive filtering, whose effect is
+defined by the <strong>libpng</strong>(3) library used by OptiPNG.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-full</strong>
+</dt>
+<dd>
+<p>
+    Produce a full report on IDAT.
+    This option might slow down the trials.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-i</strong> <em>type</em>
+</dt>
+<dd>
+<p>
+    Select the interlace type (0-1).
+</p>
+<div class="paragraph"><p>If the interlace type 0 is selected, the output image shall be
+non-interlaced (i.e. progressive-scanned).
+If the interlace type 1 is selected, the output image shall be
+interlaced using the <em>Adam7</em> method.</p></div>
+<div class="paragraph"><p>By default, the output shall have the same interlace type as the
+input.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-nb</strong>
+</dt>
+<dd>
+<p>
+    Do not apply bit depth reduction.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-nc</strong>
+</dt>
+<dd>
+<p>
+    Do not apply color type reduction.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-np</strong>
+</dt>
+<dd>
+<p>
+    Do not apply palette reduction.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-nx</strong>
+</dt>
+<dd>
+<p>
+    Do not apply any lossless image reduction:
+    enable the options <strong>-nb</strong>, <strong>-nc</strong> and <strong>-np</strong>.
+</p>
+</dd>
+<dt class="hdlist1">
+<strong>-nz</strong>
+</dt>
+<dd>
+<p>
+    Do not recode IDAT datastreams.
+</p>
+<div class="paragraph"><p>The IDAT optimization operations that do not require recoding
+(e.g. IDAT chunk concatenation) are still performed.</p></div>
+<div class="paragraph"><p>This option has effect on PNG input files only.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-zc</strong> <em>levels</em>
+</dt>
+<dd>
+<p>
+    Select the zlib compression levels used in IDAT compression.
+</p>
+<div class="paragraph"><p>The <em>levels</em> argument is specified as a rangeset (e.g. <strong>-zc6-9</strong>),
+and the default <em>levels</em> value depends on the optimization level set
+by the option <strong>-o</strong>.</p></div>
+<div class="paragraph"><p>The effect of this option is defined by the <strong>zlib</strong>(3) library used by
+OptiPNG.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-zm</strong> <em>levels</em>
+</dt>
+<dd>
+<p>
+    Select the zlib memory levels used in IDAT compression.
+</p>
+<div class="paragraph"><p>The <em>levels</em> argument is specified as a rangeset (e.g. <strong>-zm8-9</strong>), and
+the default <em>levels</em> value depends on the optimization level set by
+the option <strong>-o</strong>.</p></div>
+<div class="paragraph"><p>The effect of this option is defined by the <strong>zlib</strong>(3) library used by
+OptiPNG.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-zs</strong> <em>strategies</em>
+</dt>
+<dd>
+<p>
+    Select the zlib compression strategies used in IDAT compression.
+</p>
+<div class="paragraph"><p>The <em>strategies</em> argument is specified as a rangeset (e.g. <strong>-zs0-3</strong>),
+and the default <em>strategies</em> value depends on the optimization level
+set by the option <strong>-o</strong>.</p></div>
+<div class="paragraph"><p>The effect of this option is defined by the <strong>zlib</strong>(3) library used by
+OptiPNG.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-zw</strong> <em>size</em>
+</dt>
+<dd>
+<p>
+    Select the zlib window size (32k,16k,8k,4k,2k,1k,512,256) used in
+    IDAT compression.
+</p>
+<div class="paragraph"><p>The <em>size</em> argument can be specified either in bytes (e.g. 16384) or
+kilobytes (e.g. 16k). The default <em>size</em> value is set to the lowest
+window size that yields an IDAT output as big as if yielded by the
+value 32768.</p></div>
+<div class="paragraph"><p>The effect of this option is defined by the <strong>zlib</strong>(3) library used by
+OptiPNG.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_editing_options">Editing options</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<strong>-snip</strong>
+</dt>
+<dd>
+<p>
+    Cut one image out of multi-image, animation or video files.
+</p>
+<div class="paragraph"><p>Depending on the input format, this may be either the first or the
+most relevant (e.g. the largest) image.</p></div>
+</dd>
+<dt class="hdlist1">
+<strong>-strip</strong> <em>objects</em>
+</dt>
+<dd>
+<p>
+    Strip metadata objects from a PNG file.
+</p>
+<div class="paragraph"><p>PNG metadata is the information stored in any ancillary chunk except
+tRNS.
+(tRNS represents the alpha channel, which, even if ignored in
+rendering, is still a proper image channel in the RGBA color space.)</p></div>
+<div class="paragraph"><p>The only option currently supported is <strong>-strip all</strong>.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_notes">Notes</h3>
+<div class="paragraph"><p>Options may come in any order (except for <strong>--</strong>), before, after, or
+alternating with file names.
+Option names are case-insensitive and may be abbreviated to their
+shortest unique prefix.</p></div>
+<div class="paragraph"><p>Some options may have arguments that follow the option name,
+separated by whitespace or the equal sign (<em><strong>=</strong></em>).
+If the option argument is a number or a rangeset, the separator may
+be omitted.
+For example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>optipng -out newfile.png  &lt;=&gt;  optipng -out=newfile.png
+optipng -o3  &lt;=&gt;  optipng -o 3  &lt;=&gt;  optipng -o=3
+optipng -f0,3-5  &lt;=&gt;  optipng -f 0,3-5  &lt;=&gt;  optipng -f=0,3-5</code></pre>
+</div></div>
+<div class="paragraph"><p>Rangeset arguments are cumulative.
+For example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>optipng -f0 -f3-5  &lt;=&gt;  optipng -f0,3-5
+optipng -zs0 -zs1 -zs2,3  &lt;=&gt;  optipng -zs0-3</code></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_extended_description">EXTENDED DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The PNG optimization algorithm consists of the following steps:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Reduce the bit depth, the color type and the color palette of the
+    image.
+    This step may reduce the size of the uncompressed image, which,
+    indirectly, may reduce the size of the compressed image
+    (i.e. the size of the output PNG file).
+</p>
+</li>
+<li>
+<p>
+Run a suite of compression methods and strategies and select the
+    compression parameters that yield the smallest output file.
+</p>
+</li>
+<li>
+<p>
+Store all IDAT contents into a single chunk, eliminating the
+    overhead incurred by repeated IDAT headers and CRCs.
+</p>
+</li>
+<li>
+<p>
+Set the zlib window size inside IDAT to a minimum that does not
+    affect the compression ratio, reducing the memory requirements of
+    PNG decoders.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Not all of the above steps need to be executed.
+The behavior depends on the actual input files and user options.</p></div>
+<div class="paragraph"><p>Step 1 may be customized via the no-reduce options <strong>-nb</strong>, <strong>-nc</strong>,
+<strong>-np</strong> and <strong>-nx</strong>.
+Step 2 may be customized via the <strong>-o</strong> option, and may be fine-tuned
+via the options <strong>-zc</strong>, <strong>-zm</strong>, <strong>-zs</strong> and <strong>-zw</strong>.
+Step 3 is always executed. Step 4 is executed only if a new IDAT is
+being created, and may be fine-tuned via the option <strong>-zw</strong>.</p></div>
+<div class="paragraph"><p>Extremely exhaustive searches are not generally expected to yield
+significant improvements in compression ratio, and are recommended to
+advanced users only.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><code>optipng file.png      # default speed
+optipng -o5 file.png  # slow
+optipng -o7 file.png  # very slow</code></pre>
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bugs">BUGS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Lossless image reductions are not completely implemented.
+(This does <em>not</em> affect the integrity of the output files.)
+Here are the missing pieces:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The color palette reductions are implemented only partially.
+</p>
+</li>
+<li>
+<p>
+The bit depth reductions below 8, for grayscale images, are not
+   implemented yet.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Encoding of images whose total IDAT size exceeds 2GB is not currently
+supported.</p></div>
+<div class="paragraph"><p>TIFF support is limited to uncompressed, PNG-compatible
+(grayscale, RGB and RGBA) images.</p></div>
+<div class="paragraph"><p>Metadata is not imported from the external image formats.</p></div>
+<div class="paragraph"><p>There is no support for pipes, streams, extended file attributes or
+access control lists.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_see_also">SEE ALSO</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>png</strong>(5),
+<strong>libpng</strong>(3),
+<strong>zlib</strong>(3),
+<strong>pngcrush</strong>(1),
+<strong>pngrewrite</strong>(1).</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_standards">STANDARDS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The files produced by OptiPNG are compliant with the most recent PNG
+standard ("PNG Second Edition"), as well as the most recent PNG draft
+standard ("PNG Third Edition").</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<em>Portable Network Graphics (PNG) Specification, Second Edition</em>.<br />
+   W3C Recommendation 10 November 2003; ISO/IEC IS 15948:2003 (E).<br />
+   <a href="https://www.w3.org/TR/2003/REC-PNG-20031110/">https://www.w3.org/TR/2003/REC-PNG-20031110/</a>
+</p>
+</li>
+<li>
+<p>
+<em>Portable Network Graphics (PNG) Specification, Third Edition</em>.<br />
+   W3C Proposed Recommendation 15 May 2025.<br />
+   <a href="https://www.w3.org/TR/2025/PR-png-3-20250515/">https://www.w3.org/TR/2025/PR-png-3-20250515/</a>
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_authors">AUTHORS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>OptiPNG is written and maintained by Cosmin Truta.</p></div>
+<div class="paragraph"><p>This manual page was originally written by Nelson A. de Oliveira
+for the Debian Project.
+It was later updated by Cosmin Truta, and is now part of the OptiPNG
+distribution.</p></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2025-05-20 22:39:10 EEST
+</div>
+</div>
+</body>
+</html>

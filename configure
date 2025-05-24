@@ -1,11 +1,17 @@
 #!/bin/sh
 
-# Copyright (C) 2008-2023 Cosmin Truta.
+# Copyright (C) 2008-2025 Cosmin Truta.
 #
 # This software is distributed under the zlib license.
 # Please see the accompanying LICENSE file.
 
 trap "rm -f conftest* core a.out; exit 1" 1 2 3 15
+
+echo "WARNING:"
+echo "    This script has been deprecated in favour of the CMake file."
+echo "    It is currently being maintained on a best-effort basis only."
+echo "    Please use the CMake file, if possible."
+echo ""
 
 LC_ALL=C
 LANG=C
@@ -18,9 +24,9 @@ bindir="${bindir-\$(exec_prefix)/bin}"
 mandir="${mandir-\$(prefix)/man}"
 man1dir="${man1dir-\$(mandir)/man1}"
 
-cc="${CC-gcc}"
+cc="${CC-cc}"
 #cc="${CC-clang}"
-#cc="${CC-cc}"
+#cc="${CC-gcc}"
 cflags="$CFLAGS"
 
 enable_debug=0
@@ -31,9 +37,9 @@ with_system_zlib=0
 with_preconfigured_libpng=1
 with_preconfigured_zlib=0
 
-toplevel_srcdir=`dirname "$0"`
-libpng_srcdir="$toplevel_srcdir/third_party/libpng"
-zlib_srcdir="$toplevel_srcdir/third_party/zlib"
+top_srcdir=`dirname "$0"`
+libpng_srcdir="$top_srcdir/third_party/libpng"
+zlib_srcdir="$top_srcdir/third_party/zlib"
 
 unique_file="./src/optipng/optipng.c"
 
@@ -173,7 +179,7 @@ then
     test -r "$unique_file" || {
         echo "$0: error: no such file: '$unique_file'"
         echo "$0: note: out-of-tree builds are not supported in this configuration"
-        echo "$0: note: please run: 'cd $toplevel_srcdir && ./configure${*:+ $*}'"
+        echo "$0: note: please run: 'cd $top_srcdir && ./configure${*:+ $*}'"
         exit 1
     }
 fi
@@ -242,7 +248,12 @@ else
         echo "Using pre-configured libpng..."
         libpng_preconfig_makefile=scripts/makefile.gcc
         test -f "$libpng_srcdir/$libpng_preconfig_makefile" || {
-            echo "$0: error: no such file: '$libpng_srcdir/$libpng_preconfig_makefile'"
+            echo "$0: error: bad or missing makefile: '$libpng_srcdir/$libpng_preconfig_makefile'"
+            exit 1
+        }
+        libpng_libconf_file=../vendoring/libpng_extras/pnglibconf_optipng_nosimd.h
+        test -f "$libpng_srcdir/$libpng_libconf_file" || {
+            echo "$0: error: bad or missing libconf file: '$libpng_srcdir/$libpng_libconf_file'"
             exit 1
         }
     fi
@@ -376,7 +387,7 @@ else
     then
         echo "Using pre-configured zlib..."
         test -f "$zlib_srcdir/$ZLIB_MK" || {
-            echo "$0: error: no such file: '$zlib_srcdir/$ZLIB_MK'"
+            echo "$0: error: bad or missing makefile: '$zlib_srcdir/$ZLIB_MK'"
             exit 1
         }
     else
@@ -389,6 +400,8 @@ else
 fi
 
 sed_config="
+    s|@srcdir@|.|g
+    s|@top_srcdir@|\$(srcdir)/../..|g
     s|@prefix@|$prefix|g
     s|@exec_prefix@|$exec_prefix|g
     s|@bindir@|$bindir|g
@@ -417,7 +430,7 @@ sed_config="
     s|@LIBPNG_DISTCLEAN@|${LIBPNG_DISTCLEAN-distclean}|g
     s|@LIBPNG_DISTCLEAN_XCMD@|${LIBPNG_DISTCLEAN_XCMD-true}|g
     s|@LIBPNG_MK@|${LIBPNG_MK-Makefile}|g
-    s|@LIBPNG_MK_DEF@|${LIBPNG_MK_DEF-PNGLIBCONF_H_PREBUILT=pnglibconf.h.optipng}|g
+    s|@LIBPNG_MK_DEF@|${LIBPNG_MK_DEF-PNGLIBCONF_H_PREBUILT=$libpng_libconf_file}|g
     s|@ZLIB_DISTCLEAN@|${ZLIB_DISTCLEAN-distclean}|g
     s|@ZLIB_MK@|${ZLIB_MK-Makefile}|g
     s|@[A-Z]*_MK@|Makefile|g
@@ -427,15 +440,12 @@ sed_config="
 for subdir in \
     . \
     ./src \
-    ./src/gifread \
-    ./src/minitiff \
     ./src/opngreduc \
     ./src/optipng \
     ./src/optipng/man \
-    ./src/pngxtern \
-    ./src/pnmio
+    ./src/pngxtern
 do
     test -d "$subdir" || mkdir -p "$subdir"
     sed "$sed_config" \
-        "$toplevel_srcdir/$subdir/Makefile.in" > "$subdir/Makefile"
+        "$top_srcdir/$subdir/Makefile.in" > "$subdir/Makefile"
 done

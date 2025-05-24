@@ -2,7 +2,7 @@
  * OptiPNG: Advanced PNG optimization program.
  * http://optipng.sourceforge.net/
  *
- * Copyright (C) 2001-2018 Cosmin Truta and the Contributing Authors.
+ * Copyright (C) 2001-2025 Cosmin Truta and the Contributing Authors.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -78,7 +78,6 @@ static const char *msg_help_options =
     "    -simulate\t\trun in simulation mode\n"
     "    -out <file>\t\twrite output file to <file>\n"
     "    -dir <directory>\twrite output file(s) to <directory>\n"
-    "    -log <file>\t\tlog messages to <file>\n"
     "    --\t\t\tstop option switch parsing\n"
     "Optimization options:\n"
     "    -f <filters>\tPNG delta filters (0-5)\t\t\t[default: 0,5]\n"
@@ -137,7 +136,6 @@ static struct
 static struct opng_options options;
 
 static FILE *con_file;
-static FILE *log_file;
 
 static int start_of_line;
 
@@ -186,27 +184,6 @@ panic(const char *msg)
 /*
  * String utility.
  */
-static int
-opng_strcasecmp(const char *str1, const char *str2)
-{
-    int ch1, ch2;
-
-    /* Perform a case-insensitive string comparison. */
-    for ( ; ; )
-    {
-        ch1 = tolower(*str1++);
-        ch2 = tolower(*str2++);
-        if (ch1 != ch2)
-            return ch1 - ch2;
-        if (ch1 == '\0')
-            return 0;
-    }
-    /* FIXME: This function is not MBCS-aware. */
-}
-
-/*
- * String utility.
- */
 static char *
 opng_strltrim(const char *str)
 {
@@ -214,21 +191,6 @@ opng_strltrim(const char *str)
     while (isspace(*str))
         ++str;
     return (char *)str;
-}
-
-/*
- * String utility.
- */
-static char *
-opng_strtail(const char *str, size_t num)
-{
-    size_t len;
-
-    /* Return up to num rightmost characters. */
-    len = strlen(str);
-    if (len <= num)
-        return (char *)str;
-    return (char *)str + len - num;
 }
 
 /*
@@ -729,14 +691,10 @@ parse_args(int argc, char *argv[])
                 err_option_arg("-dir", NULL);
             options.dir_name = xopt;
         }
-        else if (strncmp("log", opt, opt_len) == 0)
+        else if (strncmp("log", opt, opt_len) == 0 && opt_len >= 2)
         {
-            /* -l PATH | ... | -log PATH */
-            if (options.log_name != NULL)
-                error("Multiple log file names are not permitted");
-            if (xopt[0] == '\0')
-                err_option_arg("-log", NULL);
-            options.log_name = xopt;
+            error("The option -log is no longer supported; "
+                  "please use shell redirection");
         }
         else
         {
@@ -751,12 +709,6 @@ parse_args(int argc, char *argv[])
             error("The option -out requires one input file");
         if (options.dir_name != NULL)
             error("The options -out and -dir are mutually exclusive");
-    }
-    if (options.log_name != NULL)
-    {
-        if (opng_strcasecmp(".log", opng_strtail(options.log_name, 4)) != 0)
-            error("To prevent accidental data corruption, "
-                  "the log file name must end with \".log\"");
     }
     if (local_options.help)
         operation = OP_SHOW_HELP;
@@ -786,12 +738,6 @@ app_printf(const char *fmt, ...)
         vfprintf(con_file, fmt, arg_ptr);
         va_end(arg_ptr);
     }
-    if (log_file != NULL)
-    {
-        va_start(arg_ptr, fmt);
-        vfprintf(log_file, fmt, arg_ptr);
-        va_end(arg_ptr);
-    }
 }
 
 /*
@@ -800,14 +746,13 @@ app_printf(const char *fmt, ...)
 static void
 app_print_cntrl(int cntrl_code)
 {
-    const char *con_str, *log_str;
+    const char *con_str;
     int i;
 
     if (cntrl_code == '\r')
     {
-        /* CR: reset line in console, new line in log file. */
+        /* CR: reset line. */
         con_str = "\r";
-        log_str = "\n";
         start_of_line = 1;
     }
     else if (cntrl_code == '\v')
@@ -815,33 +760,30 @@ app_print_cntrl(int cntrl_code)
         /* VT: new line if current line is not empty, nothing otherwise. */
         if (!start_of_line)
         {
-            con_str = log_str = "\n";
+            con_str = "\n";
             start_of_line = 1;
         }
         else
-            con_str = log_str = "";
+            con_str = "";
     }
     else if (cntrl_code < 0 && cntrl_code > -80 && start_of_line)
     {
-        /* Minus N: erase first N characters from line, in console only. */
+        /* Minus N: erase first N characters from line. */
         if (con_file != NULL)
         {
             for (i = 0; i > cntrl_code; --i)
                 fputc(' ', con_file);
         }
         con_str = "\r";
-        log_str = "";
     }
     else
     {
         /* Unhandled control code (due to internal error): show err marker. */
-        con_str = log_str = "<?>";
+        con_str = "<?>";
     }
 
     if (con_file != NULL)
         fputs(con_str, con_file);
-    if (log_file != NULL)
-        fputs(log_str, log_file);
 }
 
 /*
@@ -853,7 +795,6 @@ app_progress(unsigned long current_step, unsigned long total_steps)
     /* There will be a potentially long wait, so flush the console output. */
     if (con_file != NULL)
         fflush(con_file);
-    /* An eager flush of the line-buffered log file is not very important. */
 
     /* A GUI application would normally update a progress bar. */
     /* Here we ignore the progress info. */
@@ -875,16 +816,6 @@ app_init(void)
         con_file = stderr;
     else
         con_file = NULL;
-
-    if (options.log_name != NULL)
-    {
-        /* Open the log file, line-buffered. */
-        if ((log_file = fopen(options.log_name, "a")) == NULL)
-            error("Can't open log file: %s\n", options.log_name);
-        setvbuf(log_file, NULL, _IOLBF, BUFSIZ);
-        app_printf("** Warning: %s\n\n",
-                   "The option -log is deprecated; use shell redirection");
-    }
 }
 
 /*
@@ -893,11 +824,6 @@ app_init(void)
 static void
 app_finish(void)
 {
-    if (log_file != NULL)
-    {
-        /* Close the log file. */
-        fclose(log_file);
-    }
 }
 
 /*

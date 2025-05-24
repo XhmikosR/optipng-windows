@@ -2,7 +2,7 @@
  * ratio.c
  * Exact rational numbers.
  *
- * Copyright (C) 2003-2017 Cosmin Truta.
+ * Copyright (C) 2003-2025 Cosmin Truta.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -40,7 +40,7 @@ static int
 opng_snprintf_impl(char *buffer, size_t buffer_size, const char *format, ...)
 {
 
-#if defined _WIN32 || defined __WIN32__ || defined _WIN64 || defined __WIN64__
+#if (defined _WIN32 || defined __WIN32__) && !defined _UCRT
 #define OPNG_VSNPRINTF _vsnprintf
 #else
 #define OPNG_VSNPRINTF vsnprintf

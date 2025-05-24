@@ -14,9 +14,9 @@ RANLIB = @RANLIB@
 RM_F = @RM_F@
 
 @USE_SYSTEM_LIBPNG_FALSE@PNGDIR = ../../third_party/libpng
-GIFDIR = ../gifread
-PNMDIR = ../pnmio
-TIFFDIR = ../minitiff
+GIFDIR = ../../third_party/gifread
+PNMDIR = ../../third_party/pnmio
+TIFFDIR = ../../third_party/minitiff
 
 PNGXTERN_LIB = libpngxtern.a
 

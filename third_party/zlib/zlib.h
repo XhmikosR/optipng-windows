@@ -1,5 +1,5 @@
 /*
- * zlib version 1.3.1-optipng, 2024-Mar-24
+ * zlib version 1.3.1-optipng, 2025-May-12
  *
  * This is a modified version of zlib.
  * See README.optipng.txt for more information.
