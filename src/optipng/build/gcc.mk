@@ -34,6 +34,7 @@ ALL_LIBS = $(LIB_LIBPNG) $(LIB_ZLIB) $(LIBM) $(LIBS)
 
 OPTIPNG_DIR = ../../src/optipng
 CEXCEPT_DIR = ../../third_party/cexcept
+WILDARGS_DIR = ../../third_party/wildargs
 OPNGREDUC_DIR = ../../src/opngreduc
 OPNGREDUC_LIB = libopngreduc.a
 OPNGREDUC_MK = build/gcc.mk
@@ -113,7 +114,9 @@ optim.o: optim.c optipng.h bitset.h ioutil.h ratio.h $(OPTIPNG_DEPLIBS)
 bitset.o: bitset.c bitset.h
 ioutil.o: ioutil.c ioutil.h
 ratio.o: ratio.c ratio.h
-wildargs.o: wildargs.c
+
+wildargs.o: $(WILDARGS_DIR)/wildargs.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 $(OPNGREDUC_DIR)/$(OPNGREDUC_LIB): \
   $(OPTIPNG_DEPLIB_LIBPNG)

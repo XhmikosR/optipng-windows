@@ -1,22 +1,46 @@
 /*===
-cexcept.h 2.0.2-optipng (2022-Nov-20)
-
+cexcept.h version 2.99-optipng
+https://sourceforge.net/projects/cexcept/
 http://www.nicemice.net/cexcept/
+
+
+## Author
 
 Adam M. Costello
 http://www.nicemice.net/amc/
 
-An interface for exception-handling in ANSI C (C89 and subsequent ISO
+
+## Summary
+
+An interface for exception handling in ANSI C (C89 and subsequent ISO
 standards), developed jointly with Cosmin Truta.
 
-    Copyright (c) 2000-2022 Adam M. Costello and Cosmin Truta.
-    This software may be modified only if its author and version
-    information is updated accurately, and may be redistributed
-    only if accompanied by this unaltered notice.  Subject to those
-    restrictions, permission is granted to anyone to do anything
-    with this software.  The copyright holders make no guarantees
-    regarding this software, and are not responsible for any damage
-    resulting from its use.
+
+## Copyright Notice, Disclaimer and License
+
+ * Copyright (c) 2000-2025 Cosmin Truta.
+ * Copyright (c) 2000-2008 Adam M. Costello.
+
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+ 1. The origin of this software must not be misrepresented; you must not
+    claim that you wrote the original software.  If you use this software
+    in a product, an acknowledgment in the product documentation would be
+    appreciated but is not required.
+
+ 2. Altered source versions must be plainly marked as such, and must not
+    be misrepresented as being the original software.
+
+ 3. This notice may not be removed or altered from any source distribution.
+
+
+## API Notes
 
 The cexcept interface is not compatible with and cannot interact
 with system exceptions (like division by zero or memory segmentation

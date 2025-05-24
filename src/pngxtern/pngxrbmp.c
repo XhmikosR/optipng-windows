@@ -1,6 +1,6 @@
 /*
  * pngxrbmp.c - libpng external I/O: BMP reader.
- * Copyright (C) 2003-2016 Cosmin Truta and the Contributing Authors.
+ * Copyright (C) 2003-2024 Cosmin Truta and the Contributing Authors.
  *
  * This code was derived from "bmp2png.c" by MIYASAKA Masaru, and
  * is distributed under the same copyright and warranty terms as libpng.
@@ -102,8 +102,10 @@ bmp_get_word(png_bytep ptr)
 static png_uint_32
 bmp_get_dword(png_bytep ptr)
 {
-   return ((png_uint_32)ptr[0])       + ((png_uint_32)ptr[1] << 8) +
-          ((png_uint_32)ptr[2] << 16) + ((png_uint_32)ptr[3] << 24);
+   return ((png_uint_32)ptr[0]) +
+          ((png_uint_32)ptr[1] << 8) +
+          ((png_uint_32)ptr[2] << 16) +
+          ((png_uint_32)ptr[3] << 24);
 }
 
 
@@ -123,8 +125,9 @@ bmp_memset_halfbytes(png_bytep ptr, size_t offset, int ch, size_t len)
    if (len == 0)
       return;
    ptr += offset / 2;
-   if (offset & 1)  /* use half-byte operations at odd offset */
+   if (offset & 1)
    {
+      /* Perform half-byte operations at odd offset. */
       *ptr = (png_byte)((*ptr & 0xf0) | (ch & 0x0f));
       ch = ((ch & 0xf0) >> 4) | ((ch & 0x0f) << 4);
       ++ptr;
@@ -142,7 +145,10 @@ bmp_fread_bytes(png_bytep ptr, size_t offset, size_t len, FILE *stream)
 
    result = fread(ptr + offset, 1, len, stream);
    if (len & 1)
-      getc(stream);  /* skip padding */
+   {
+      /* Skip padding. */
+      getc(stream);
+   }
    return result;
 }
 
@@ -155,8 +161,9 @@ bmp_fread_halfbytes(png_bytep ptr, size_t offset, size_t len, FILE *stream)
    if (len == 0)
       return 0;
    ptr += offset / 2;
-   if (offset & 1)  /* use half-byte operations at odd offset */
+   if (offset & 1)
    {
+      /* Perform half-byte operations at odd offset. */
       for (result = 0; result < len - 1; result += 2)
       {
          ch = getc(stream);
@@ -169,10 +176,14 @@ bmp_fread_halfbytes(png_bytep ptr, size_t offset, size_t len, FILE *stream)
    }
    else
    {
+      /* Perform half-byte operations at even offset. */
       result = fread(ptr, 1, (len + 1) / 2, stream) * 2;
    }
    if (len & 2)
-      getc(stream);  /* skip padding */
+   {
+      /* Skip padding. */
+      getc(stream);
+   }
    return (result <= len) ? result : len;
 }
 
@@ -210,8 +221,11 @@ bmp_process_mask(png_uint_32 bmp_mask, png_bytep sig_bit, png_bytep shift_bit)
 /*****************************************************************************/
 
 static size_t
-bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
-              unsigned int compression, FILE *stream)
+bmp_read_rows(png_bytepp begin_row,
+              png_bytepp end_row,
+              size_t row_size,
+              unsigned int compression,
+              FILE *stream)
 {
    size_t result;
    png_bytepp crt_row;
@@ -223,7 +237,10 @@ bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
    size_t (*bmp_fread_fn)(png_bytep, size_t, size_t, FILE *);
 
    if (row_size == 0)
-      return 0;  /* this should not happen */
+   {
+      /* TODO: assert(0); */
+      return 0;
+   }
 
    inc = (begin_row <= end_row) ? 1 : -1;
    crtn = 0;
@@ -281,15 +298,18 @@ bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
                crt_row += inc;
                crtn = 0;
                ++result;
-               if (crt_row == end_row)  /* all rows are read */
+               if (crt_row == end_row)
                {
-                  ch = getc(stream);  /* check for the end of bitmap */
+                  /* All rows are read. Check for the end of bitmap. */
+                  ch = getc(stream);
                   if (ch != EOF && ch != 0)
                   {
-                     ungetc(ch, stream);  /* forget about the end of bitmap */
+                     /* Forget about the end of bitmap. */
+                     ungetc(ch, stream);
                      break;
                   }
-                  getc(stream);  /* expect 1, but break the loop anyway */
+                  /* Expect 1, but break the loop anyway. */
+                  getc(stream);
                   break;
                }
             }
@@ -298,9 +318,10 @@ bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
                bmp_memset_fn(*crt_row, crtn, 0, endn - crtn);
                crt_row += inc;
                crtn = 0;
-               result = (begin_row <= end_row) ?
-                  (end_row - begin_row) : (begin_row - end_row);
-               break;  /* the rest is wiped out at the end */
+               result = (begin_row <= end_row)
+                        ? (end_row - begin_row) : (begin_row - end_row);
+               break;
+               /* The remaining rows are wiped out at the end. */
             }
             else if (b2 == 2)  /* delta */
             {
@@ -338,7 +359,10 @@ bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
       }
    }
    else
-      return 0;  /* error: compression method not applicable. */
+   {
+      /* TODO: assert(0); */
+      return 0;  /* unexpected compression method */
+   }
 
    /* Wipe out the portion left unread. */
    for ( ; crt_row != end_row; crt_row += inc)
@@ -357,8 +381,11 @@ bmp_read_rows(png_bytepp begin_row, png_bytepp end_row, size_t row_size,
 
 static void
 bmp_to_png_rows(png_bytepp row_pointers,
-                png_uint_32 width, png_uint_32 height, unsigned int pixdepth,
-                png_bytep rgba_sig, png_bytep rgba_shift)
+                png_uint_32 width,
+                png_uint_32 height,
+                unsigned int pixdepth,
+                png_bytep rgba_sig,
+                png_bytep rgba_shift)
 {
    png_bytep src_ptr, dest_ptr;
    unsigned int rgba_mask[4];
@@ -368,8 +395,9 @@ bmp_to_png_rows(png_bytepp row_pointers,
    png_uint_32 x, y;
    unsigned int i;
 
-   if (pixdepth == 24)  /* BGR -> RGB */
+   if (pixdepth == 24)
    {
+      /* Convert BGR to RGB. */
       for (y = 0; y < height; ++y)
       {
          src_ptr = row_pointers[y];
@@ -414,8 +442,10 @@ bmp_to_png_rows(png_bytepp row_pointers,
          for (x = 0; x < width; ++x, src_ptr += 4, dest_ptr += num_samples)
          {
             /* Inline bmp_get_dword() for performance reasons. */
-            dwpix = (png_uint_32)src_ptr[0] + ((png_uint_32)src_ptr[1] << 8) +
-            ((png_uint_32)src_ptr[2] << 16) + ((png_uint_32)src_ptr[3] << 24);
+            dwpix = ((png_uint_32)src_ptr[0]) +
+                    ((png_uint_32)src_ptr[1] << 8) +
+                    ((png_uint_32)src_ptr[2] << 16) +
+                    ((png_uint_32)src_ptr[3] << 24);
             for (i = 0; i < num_samples; ++i)
             {
                mask = rgba_mask[i];
@@ -452,18 +482,14 @@ pngx_sig_is_bmp(png_bytep sig, size_t sig_size,
    bihsize = bmp_get_dword(sig + FILEHED_SIZE);
    if ((bihsize > PNG_UINT_31_MAX) ||
        (bihsize != COREHED_SIZE && bihsize < INFOHED_SIZE))
-      return 0;  /* garbage in bihsize, this cannot be BMP */
+      return 0;  /* garbage in bihsize, this cannot be a valid BMP */
 
    /* Store the format name. */
    if (fmt_name_ptr != NULL)
       *fmt_name_ptr = bmp_fmt_name;
    if (fmt_long_name_ptr != NULL)
-   {
-      if (bihsize == COREHED_SIZE)
-         *fmt_long_name_ptr = os2bmp_fmt_long_name;
-      else
-         *fmt_long_name_ptr = winbmp_fmt_long_name;
-   }
+      *fmt_long_name_ptr = (bihsize == COREHED_SIZE)
+                           ? os2bmp_fmt_long_name : winbmp_fmt_long_name;
    return 1;  /* BMP */
 }
 
@@ -480,7 +506,8 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
    png_uint_32 compression;
    unsigned int palsize, palnum;
    png_uint_32 rgba_mask[4];
-   png_byte rgba_sig[4], rgba_shift[4];
+   png_byte rgba_sig[4];
+   png_byte rgba_shift[4];
    int bit_depth, color_type;
    png_color palette[256];
    png_color_8 sig_bit;
@@ -488,8 +515,8 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
    unsigned int i;
    size_t y;
 
-   /* Find the BMP header. */
-   for (i = 0; ; ++i)  /* skip macbinary header */
+   /* Find the BMP header. Skip the "macbinary" header if necessary. */
+   for (i = 0; ; ++i)
    {
       if (fread(bfh, FILEHED_SIZE + BIHSIZE_SIZE, 1, stream) != 1)
          ++i;
@@ -504,41 +531,46 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
    /* Read the BMP header. */
    offbits = bmp_get_dword(bfh + BFH_DOFFBITS);
    bihsize = bmp_get_dword(bfh + BFH_DBIHSIZE);
-   if ((offbits > PNG_UINT_31_MAX) || (bihsize > PNG_UINT_31_MAX) ||
+   if ((offbits > PNG_UINT_31_MAX) ||
+       (bihsize > PNG_UINT_31_MAX) ||
        (offbits < bihsize + FILEHED_SIZE) ||
        (bihsize != COREHED_SIZE && bihsize < INFOHED_SIZE))
-      return 0;  /* not a BMP file, just a file with a matching signature */
+      return 0;  /* not a BMP file (just a file with a matching signature) */
+   skip = 0;
    if (bihsize > BMPV5HED_SIZE)
    {
       skip = bihsize - BMPV5HED_SIZE;
       bihsize = BMPV5HED_SIZE;
    }
-   else
-      skip = 0;
    if (fread(bih + BIHSIZE_SIZE, bihsize - BIHSIZE_SIZE, 1, stream) != 1)
       return 0;
    if (skip > 0)
+   {
       if (fseek(stream, (long)skip, SEEK_CUR) != 0)
          return 0;
+   }
    skip = offbits - bihsize - FILEHED_SIZE;  /* new skip */
    topdown = 0;
-   if (bihsize < INFOHED_SIZE)  /* OS/2 BMP */
+   if (bihsize < INFOHED_SIZE)
    {
+      /* Initialize the OS/2 BMP structure. */
       width       = bmp_get_word(bih + BCH_WWIDTH);
       height      = bmp_get_word(bih + BCH_WHEIGHT);
       pixdepth    = bmp_get_word(bih + BCH_WBITCOUNT);
       compression = BI_RGB;
       palsize     = RGBTRIPLE_SIZE;
    }
-   else  /* Windows BMP */
+   else
    {
+      /* Initialize the Windows BMP structure. */
       width       = bmp_get_dword(bih + BIH_LWIDTH);
       height      = bmp_get_dword(bih + BIH_LHEIGHT);
       pixdepth    = bmp_get_word(bih + BIH_WBITCOUNT);
       compression = bmp_get_dword(bih + BIH_DCOMPRESSION);
       palsize     = RGBQUAD_SIZE;
-      if (height > PNG_UINT_31_MAX)  /* top-down BMP */
+      if (height > PNG_UINT_31_MAX)
       {
+         /* Make adjustments for the top-down BMP. */
          height  = PNG_UINT_32_MAX - height + 1;
          topdown = 1;
       }
@@ -594,7 +626,7 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
        * (Although the BMP spec does not mention pixel depth = 2,
        * it is supported for robustness reasons, at no extra cost.)
        */
-      if (pixdepth > 0 && 32 % pixdepth != 0 && pixdepth != 24)
+      if ((pixdepth > 0) && (32 % pixdepth != 0) && (pixdepth != 24))
          pixdepth = 0;
       break;
    case BI_RLE8:
@@ -606,7 +638,7 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
          pixdepth = 0;
       break;
    case BI_BITFIELDS:
-      if (pixdepth != 16 && pixdepth != 32)
+      if ((pixdepth != 16) && (pixdepth != 32))
          pixdepth = 0;
       break;
    case BI_JPEG:
@@ -614,8 +646,20 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
       /* NOTREACHED */
       break;
    case BI_PNG:
-      if (ungetc(getc(stream), stream) == 0)  /* IHDR is likely to follow */
+      switch (ungetc(getc(stream), stream))
+      {
+      case 0:
+         /* An IHDR chunk is likely to follow. */
+         /* TODO: Check the entire IHDR chunk header. */
          png_set_sig_bytes(png_ptr, 8);
+         break;
+      case 137:
+         /* A PNG signature is likely to follow. */
+         /* TODO: Check the entire PNG signature. */
+         break;
+      default:
+         png_error(png_ptr, "Invalid PNG-compressed stream in BMP file");
+      }
       png_set_read_fn(png_ptr, stream, NULL);
       png_read_png(png_ptr, info_ptr, 0, NULL);
       /* TODO: Check for mismatches between the BMP and PNG info. */
@@ -657,30 +701,35 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
       case 32:
          rowsize = width * 4;
          break;
-      default:  /* never get here */
+      default:
+         /* TODO: assert(0); */
          bit_depth = 0;
          rowsize = 0;
       }
       if (rowsize / width < pixdepth / 8)
          rowsize = 0;  /* overflow */
-      color_type = (rgba_mask[3] != 0) ?
-         PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
+      color_type = (rgba_mask[3] != 0)
+                   ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB;
    }
    if (rowsize == 0)
       png_error(png_ptr, "Can't handle exceedingly large BMP dimensions");
 
    /* Set the PNG image type. */
    png_set_IHDR(png_ptr, info_ptr,
-      width, height, bit_depth, color_type,
-      PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+                width, height, bit_depth, color_type,
+                PNG_INTERLACE_NONE,
+                PNG_COMPRESSION_TYPE_BASE,
+                PNG_FILTER_TYPE_BASE);
    if (pixdepth > 8)
    {
       for (i = 0; i < 4; ++i)
          bmp_process_mask(rgba_mask[i], &rgba_sig[i], &rgba_shift[i]);
       if (rgba_sig[0] == 0 || rgba_sig[1] == 0 || rgba_sig[2] == 0)
          png_error(png_ptr, "Invalid color mask in BMP file");
-      if (rgba_sig[0] != 8 || rgba_sig[1] != 8 ||
-          rgba_sig[2] != 8 || (rgba_sig[3] != 0 && rgba_sig[3] != 8))
+      if ((rgba_sig[0] != 8) ||
+          (rgba_sig[1] != 8) ||
+          (rgba_sig[2] != 8) ||
+          ((rgba_sig[3] != 0) && (rgba_sig[3] != 8)))
       {
          sig_bit.red   = rgba_sig[0];
          sig_bit.green = rgba_sig[1];
@@ -725,7 +774,7 @@ pngx_read_bmp(png_structp png_ptr, png_infop info_ptr, FILE *stream)
    /* Postprocess the image data, even if it has not been read entirely. */
    if (pixdepth > 8)
       bmp_to_png_rows(row_pointers, width, height, pixdepth,
-         rgba_sig, rgba_shift);
+                      rgba_sig, rgba_shift);
 
    /* Check the result. */
    if (y != (size_t)height)

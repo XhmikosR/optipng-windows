@@ -1,12 +1,13 @@
 Name: libpng
-Summary: The PNG reference library
-Authors: Cosmin Truta et al.
-Version: 1.6.40
-License: the libpng license (zlib-like); see LICENSE
-URL: http://libpng.org/
+Summary: The PNG Reference Library
+Authors: The PNG Reference Library Authors (Cosmin Truta et al.)
+License: libpng-2.0
+License file: LICENSE
+Version: 1.6.47
+URL: http://libpng.org/pub/png/libpng.html
 
 Modifications:
  - Added pnglibconf.h.optipng to allow a leaner and meaner libpng build.
 
-Patches:
- - pnglibconf.h.optipng.diff
+Patch files:
+ - libpng-1.6.47-optipng.diff

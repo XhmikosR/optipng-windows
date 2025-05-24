@@ -1042,7 +1042,17 @@ opng_reduce_to_palette(png_structp png_ptr, png_infop info_ptr,
       interlace_type, compression_type, filter_type);
    png_set_PLTE(png_ptr, info_ptr, palette, num_palette);
    if (num_trans > 0)
+   {
+      /* The RGB triplet in tRNS became a one-entry transparency palette. */
+      OPNG_ASSERT(num_trans == 1);
       png_set_tRNS(png_ptr, info_ptr, trans_alpha, num_trans, NULL);
+   }
+   else if (trans_color != NULL)
+   {
+      /* The RGB triplet in tRNS did not match any of the image pixels. */
+      png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, -1);
+      png_set_invalid(png_ptr, info_ptr, PNG_INFO_tRNS);
+   }
    /* bKGD (if present) is automatically updated. */
 
    png_free(png_ptr, alpha_row);
