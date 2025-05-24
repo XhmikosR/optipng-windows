@@ -1,0 +1,335 @@
+OPTIPNG(1)                      OptiPNG Manual                      OPTIPNG(1)
+
+NAME
+       optipng - optimize Portable Network Graphics (PNG) files
+
+SYNOPSIS
+       optipng [<options...>] [--] <files...>
+
+DESCRIPTION
+       The OptiPNG program shall attempt to optimize PNG files, i.e. to reduce
+       their size to a minimum, without losing semantic information. In
+       addition, this program shall perform a suite of auxiliary functions
+       like integrity checks, metadata recovery and pixmap-to-PNG conversion.
+
+       The optimization attempts are not guaranteed to succeed. Valid PNG
+       files that cannot be optimized by this program are normally left
+       intact; their size will not grow. The user may request to override this
+       default behavior.
+
+FILES
+       The input files are raster image files encoded either in PNG format
+       (the native format), or in an external format. The currently supported
+       external formats are GIF, BMP, PNM and TIFF.
+
+       OptiPNG processes each image file given in the command line as follows:
+
+       -   If the image is in PNG format:
+
+           It attempts to optimize the given file in-place. If optimization is
+           successful, or if the option -force is enabled, the original file
+           will be replaced by its optimized version. In any case, the
+           original file will be backed up if the option -keep is enabled.
+
+       -   If the image is in an external format:
+
+           It creates an optimized PNG version of the given file. The output
+           file name will be constructed using the original file name and the
+           .png extension.
+
+       Aside from the rules stated above, any existing file is not
+       overwritten, unless the option -clobber is enabled.
+
+OPTIONS
+   General options
+       -?, -h, -help
+           Show a complete summary of options.
+
+       -backup, -keep
+           Keep a backup of the modified files.
+
+       -clobber
+           Overwrite the existing output and backup files.
+
+           Under this option, if the option -backup is not enabled, the old
+           backups of the overwritten files will be deleted.
+
+       -dir directory
+           Write the output files to directory.
+
+       -fix
+           Enable error recovery. This option has no effect on valid input
+           files.
+
+           The program will spend a reasonable amount of effort to recover as
+           much data as possible, without increasing the output file size, but
+           the success cannot be generally guaranteed. The program may even
+           increase the file size, e.g., by reconstructing missing critical
+           data. Under this option, integrity shall take precedence over file
+           size.
+
+           When this option is not used, the invalid input files are left
+           unprocessed.
+
+       -force
+           Enforce writing of a new output file.
+
+           This option overrides the program's decision not to write such
+           file, e.g. when the PNG input is digitally signed (using dSIG), or
+           when the PNG output becomes larger than the PNG input.
+
+       -out file
+           Write output file to file.
+
+           The command line must contain exactly one input file.
+
+       -preserve
+           Preserve file attributes (time stamps, file access rights, etc.)
+           where applicable.
+
+       -quiet, -silent
+           Run in quiet mode.
+
+       -simulate
+           Run in simulation mode: perform the trials, but do not create
+           output files.
+
+       -v
+           Enable the options -verbose and -version.
+
+       -verbose
+           Run in verbose mode.
+
+       -version
+           Show the copyright, version and build info.
+
+       --
+           Stop option switch parsing.
+
+   PNG encoding and optimization options
+       -o level
+           Select the optimization level.
+
+           The optimization level 0 enables a set of optimization operations
+           that require minimal effort. There will be no changes to image
+           attributes like bit depth or color type, and no recompression of
+           existing IDAT datastreams.
+
+           The optimization level 1 enables a single IDAT compression trial.
+           The trial chosen is what OptiPNG thinks it might be the most
+           effective.
+
+           The optimization levels 2 and higher enable multiple IDAT
+           compression trials; the higher the level, the more trials.
+
+           The behavior and the default value of this option may change across
+           different program versions. Use the option -h to see the details
+           pertaining to your specific version.
+
+       -f filters
+           Select the PNG delta filters.
+
+           The filters argument is specified as a rangeset (e.g.  -f0-5), and
+           the default filters value depends on the optimization level set by
+           the option -o.
+
+           The filter values 0, 1, 2, 3 and 4 indicate static filtering, and
+           correspond to the standard PNG filter codes (None, Left, Up,
+           Average and Paeth, respectively). The filter value 5 indicates
+           adaptive filtering, whose effect is defined by the libpng(3)
+           library used by OptiPNG.
+
+       -full
+           Produce a full report on IDAT. This option might slow down the
+           trials.
+
+       -i type
+           Select the interlace type (0-1).
+
+           If the interlace type 0 is selected, the output image shall be
+           non-interlaced (i.e. progressive-scanned). If the interlace type 1
+           is selected, the output image shall be interlaced using the Adam7
+           method.
+
+           By default, the output shall have the same interlace type as the
+           input.
+
+       -nb
+           Do not apply bit depth reduction.
+
+       -nc
+           Do not apply color type reduction.
+
+       -np
+           Do not apply palette reduction.
+
+       -nx
+           Do not apply any lossless image reduction: enable the options -nb,
+           -nc and -np.
+
+       -nz
+           Do not recode IDAT datastreams.
+
+           The IDAT optimization operations that do not require recoding (e.g.
+           IDAT chunk concatenation) are still performed.
+
+           This option has effect on PNG input files only.
+
+       -zc levels
+           Select the zlib compression levels used in IDAT compression.
+
+           The levels argument is specified as a rangeset (e.g.  -zc6-9), and
+           the default levels value depends on the optimization level set by
+           the option -o.
+
+           The effect of this option is defined by the zlib(3) library used by
+           OptiPNG.
+
+       -zm levels
+           Select the zlib memory levels used in IDAT compression.
+
+           The levels argument is specified as a rangeset (e.g.  -zm8-9), and
+           the default levels value depends on the optimization level set by
+           the option -o.
+
+           The effect of this option is defined by the zlib(3) library used by
+           OptiPNG.
+
+       -zs strategies
+           Select the zlib compression strategies used in IDAT compression.
+
+           The strategies argument is specified as a rangeset (e.g.  -zs0-3),
+           and the default strategies value depends on the optimization level
+           set by the option -o.
+
+           The effect of this option is defined by the zlib(3) library used by
+           OptiPNG.
+
+       -zw size
+           Select the zlib window size (32k,16k,8k,4k,2k,1k,512,256) used in
+           IDAT compression.
+
+           The size argument can be specified either in bytes (e.g. 16384) or
+           kilobytes (e.g. 16k). The default size value is set to the lowest
+           window size that yields an IDAT output as big as if yielded by the
+           value 32768.
+
+           The effect of this option is defined by the zlib(3) library used by
+           OptiPNG.
+
+   Editing options
+       -snip
+           Cut one image out of multi-image, animation or video files.
+
+           Depending on the input format, this may be either the first or the
+           most relevant (e.g. the largest) image.
+
+       -strip objects
+           Strip metadata objects from a PNG file.
+
+           PNG metadata is the information stored in any ancillary chunk
+           except tRNS. (tRNS represents the alpha channel, which, even if
+           ignored in rendering, is still a proper image channel in the RGBA
+           color space.)
+
+           The only option currently supported is -strip all.
+
+   Notes
+       Options may come in any order (except for --), before, after, or
+       alternating with file names. Option names are case-insensitive and may
+       be abbreviated to their shortest unique prefix.
+
+       Some options may have arguments that follow the option name, separated
+       by whitespace or the equal sign (=). If the option argument is a number
+       or a rangeset, the separator may be omitted. For example:
+
+           optipng -out newfile.png  <=>  optipng -out=newfile.png
+           optipng -o3  <=>  optipng -o 3  <=>  optipng -o=3
+           optipng -f0,3-5  <=>  optipng -f 0,3-5  <=>  optipng -f=0,3-5
+
+       Rangeset arguments are cumulative. For example:
+
+           optipng -f0 -f3-5  <=>  optipng -f0,3-5
+           optipng -zs0 -zs1 -zs2,3  <=>  optipng -zs0-3
+
+EXTENDED DESCRIPTION
+       The PNG optimization algorithm consists of the following steps:
+
+        1. Reduce the bit depth, the color type and the color palette of the
+           image. This step may reduce the size of the uncompressed image,
+           which, indirectly, may reduce the size of the compressed image
+           (i.e. the size of the output PNG file).
+
+        2. Run a suite of compression methods and strategies and select the
+           compression parameters that yield the smallest output file.
+
+        3. Store all IDAT contents into a single chunk, eliminating the
+           overhead incurred by repeated IDAT headers and CRCs.
+
+        4. Set the zlib window size inside IDAT to a minimum that does not
+           affect the compression ratio, reducing the memory requirements of
+           PNG decoders.
+
+       Not all of the above steps need to be executed. The behavior depends on
+       the actual input files and user options.
+
+       Step 1 may be customized via the no-reduce options -nb, -nc, -np and
+       -nx. Step 2 may be customized via the -o option, and may be fine-tuned
+       via the options -zc, -zm, -zs and -zw. Step 3 is always executed. Step
+       4 is executed only if a new IDAT is being created, and may be
+       fine-tuned via the option -zw.
+
+       Extremely exhaustive searches are not generally expected to yield
+       significant improvements in compression ratio, and are recommended to
+       advanced users only.
+
+EXAMPLES
+           optipng file.png      # default speed
+           optipng -o5 file.png  # slow
+           optipng -o7 file.png  # very slow
+
+BUGS
+       Lossless image reductions are not completely implemented. (This does
+       not affect the integrity of the output files.) Here are the missing
+       pieces:
+
+       -   The color palette reductions are implemented only partially.
+
+       -   The bit depth reductions below 8, for grayscale images, are not
+           implemented yet.
+
+       Encoding of images whose total IDAT size exceeds 2GB is not currently
+       supported.
+
+       TIFF support is limited to uncompressed, PNG-compatible (grayscale, RGB
+       and RGBA) images.
+
+       Metadata is not imported from the external image formats.
+
+       There is no support for pipes, streams, extended file attributes or
+       access control lists.
+
+SEE ALSO
+       png(5), libpng(3), zlib(3), pngcrush(1), pngrewrite(1).
+
+STANDARDS
+       The files produced by OptiPNG are compliant with the most recent PNG
+       standard ("PNG Second Edition"), as well as the most recent PNG draft
+       standard ("PNG Third Edition").
+
+       -   Portable Network Graphics (PNG) Specification, Second Edition.
+           W3C Recommendation 10 November 2003; ISO/IEC IS 15948:2003 (E).
+           https://www.w3.org/TR/2003/REC-PNG-20031110/
+
+       -   Portable Network Graphics (PNG) Specification, Third Edition.
+           W3C Proposed Recommendation 15 May 2025.
+           https://www.w3.org/TR/2025/PR-png-3-20250515/
+
+AUTHORS
+       OptiPNG is written and maintained by Cosmin Truta.
+
+       This manual page was originally written by Nelson A. de Oliveira for
+       the Debian Project. It was later updated by Cosmin Truta, and is now
+       part of the OptiPNG distribution.
+
+optipng 7.9.1                     2025-05-20                        OPTIPNG(1)

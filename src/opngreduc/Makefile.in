@@ -1,6 +1,9 @@
-.PHONY: all test check clean distclean
+# Makefile.in
+
 .PRECIOUS: Makefile
 .SUFFIXES: .c .o .a
+
+srcdir = @srcdir@
 
 CC = @CC@
 CFLAGS = @CFLAGS@
@@ -16,17 +19,20 @@ RM_F = @RM_F@
 @USE_SYSTEM_LIBPNG_FALSE@PNGDIR = ../../third_party/libpng
 
 OPNGREDUC_LIB = libopngreduc.a
-
 OPNGREDUC_OBJS = opngreduc.o
 
 @USE_SYSTEM_LIBPNG_FALSE@OPNGREDUC_DEPINCLUDE_LIBPNG = -I$(PNGDIR)
 @USE_SYSTEM_LIBPNG_TRUE@OPNGREDUC_DEPINCLUDE_LIBPNG =
 OPNGREDUC_DEPINCLUDES = $(OPNGREDUC_DEPINCLUDE_LIBPNG)
 
+.PHONY: all
 all: $(OPNGREDUC_LIB)
 
+.PHONY: test
 test:
+	@echo TODO: test $(OPNGREDUC_LIB)
 
+.PHONY: check
 check: test
 
 .c.o:
@@ -37,9 +43,12 @@ $(OPNGREDUC_LIB): $(OPNGREDUC_OBJS)
 	$(RANLIB) $@
 
 opngreduc.o: opngreduc.c opngreduc.h
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $(OPNGREDUC_DEPINCLUDES) -o $@ $<
 
+.PHONY: clean
 clean:
 	-$(RM_F) $(OPNGREDUC_LIB) $(OPNGREDUC_OBJS)
 
+.PHONY: distclean
 distclean: clean
 	-$(RM_F) Makefile

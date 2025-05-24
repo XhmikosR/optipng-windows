@@ -1,7 +1,7 @@
 /*
  * opngreduc.c - libpng extension: lossless image reductions.
  *
- * Copyright (C) 2003-2018 Cosmin Truta.
+ * Copyright (C) 2003-2025 Cosmin Truta.
  * This software is distributed under the same licensing and warranty terms
  * as libpng.
  */
@@ -1043,15 +1043,22 @@ opng_reduce_to_palette(png_structp png_ptr, png_infop info_ptr,
    png_set_PLTE(png_ptr, info_ptr, palette, num_palette);
    if (num_trans > 0)
    {
-      /* The RGB triplet in tRNS became a one-entry transparency palette. */
-      OPNG_ASSERT(num_trans == 1);
+      if (!(color_type & PNG_COLOR_MASK_ALPHA))
+      {
+         /* The source tRNS has exactly one match in the palette. */
+         OPNG_ASSERT(trans_color != NULL);
+         OPNG_ASSERT(num_trans == 1);
+      }
       png_set_tRNS(png_ptr, info_ptr, trans_alpha, num_trans, NULL);
    }
-   else if (trans_color != NULL)
+   else  /* num_trans == 0 */
    {
-      /* The RGB triplet in tRNS did not match any of the image pixels. */
-      png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, -1);
-      png_set_invalid(png_ptr, info_ptr, PNG_INFO_tRNS);
+      if (trans_color != NULL)
+      {
+         /* The source tRNS has no match in the palette and must be removed. */
+         png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, -1);
+         png_set_invalid(png_ptr, info_ptr, PNG_INFO_tRNS);
+      }
    }
    /* bKGD (if present) is automatically updated. */
 

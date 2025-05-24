@@ -2,7 +2,7 @@
  * ratio.h
  * Exact rational numbers.
  *
- * Copyright (C) 2003-2017 Cosmin Truta.
+ * Copyright (C) 2003-2025 Cosmin Truta.
  *
  * This software is distributed under the zlib license.
  * Please see the accompanying LICENSE file.
@@ -18,12 +18,37 @@
  * The following definitions exist for the benefit of pre-C99 and pre-C++11
  * compilers and runtimes that are unable to grok the long long type.
  */
+
 #ifndef OPNG_LLONG_T_DEFINED
-
 #include <limits.h>
+#endif  /* OPNG_LLONG_T_DEFINED */
 
-#if defined LLONG_MAX && defined ULLONG_MAX
-#if (LLONG_MAX >= LONG_MAX) && (ULLONG_MAX >= ULONG_MAX)
+#ifndef OPNG_LLONG_T_DEFINED
+#if (defined _WIN32 || defined __WIN32__) && !defined _UCRT
+#if defined _I64_MIN && defined _I64_MAX && defined _UI64_MAX
+typedef __int64 opng_llong_t;
+typedef unsigned __int64 opng_ullong_t;
+#if defined LLONG_MIN && defined LLONG_MAX && defined ULLONG_MAX
+#define OPNG_LLONG_MIN LLONG_MIN
+#define OPNG_LLONG_MAX LLONG_MAX
+#define OPNG_ULLONG_MAX ULLONG_MAX
+#define OPNG_LLONG_C(value) value##LL
+#define OPNG_ULLONG_C(value) value##ULL
+#else
+#define OPNG_LLONG_MIN _I64_MIN
+#define OPNG_LLONG_MAX _I64_MAX
+#define OPNG_ULLONG_MAX _UI64_MAX
+#define OPNG_LLONG_C(value) value##i64
+#define OPNG_ULLONG_C(value) value##ui64
+#endif
+#define OPNG_LLONG_FORMAT_PREFIX "I64"
+#define OPNG_LLONG_T_DEFINED 1
+#endif
+#endif
+#endif  /* OPNG_LLONG_T_DEFINED */
+
+#ifndef OPNG_LLONG_T_DEFINED
+#if defined LLONG_MIN && defined LLONG_MAX && defined ULLONG_MAX
 typedef long long opng_llong_t;
 typedef unsigned long long opng_ullong_t;
 #define OPNG_LLONG_MIN LLONG_MIN
@@ -31,30 +56,9 @@ typedef unsigned long long opng_ullong_t;
 #define OPNG_ULLONG_MAX ULLONG_MAX
 #define OPNG_LLONG_C(value) value##LL
 #define OPNG_ULLONG_C(value) value##ULL
-#define OPNG_LLONG_T_DEFINED 1
-#endif
-#elif defined _I64_MAX && defined _UI64_MAX
-#if defined _WIN32 || defined __WIN32__
-typedef __int64 opng_llong_t;
-typedef unsigned __int64 opng_ullong_t;
-#define OPNG_LLONG_MIN _I64_MIN
-#define OPNG_LLONG_MAX _I64_MAX
-#define OPNG_ULLONG_MAX _UI64_MAX
-#define OPNG_LLONG_C(value) value##i64
-#define OPNG_ULLONG_C(value) value##ui64
-#define OPNG_LLONG_T_DEFINED 1
-#endif
-#endif
-
-#ifdef OPNG_LLONG_T_DEFINED
-#if defined _WIN32 || defined __WIN32__
-/* The "ll" format modifier may not work on Windows XP and earlier. */
-#define OPNG_LLONG_FORMAT_PREFIX "I64"
-#else
 #define OPNG_LLONG_FORMAT_PREFIX "ll"
+#define OPNG_LLONG_T_DEFINED 1
 #endif
-#endif
-
 #endif  /* OPNG_LLONG_T_DEFINED */
 
 

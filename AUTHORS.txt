@@ -1,4 +1,4 @@
-# OptiPNG version 0.7.9
+# OptiPNG version 7.9.1
 # Copyright (C) 2001-2025 Cosmin Truta and the Contributing Authors.
 # See the accompanying LICENSE file for details.
 #

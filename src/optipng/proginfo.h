@@ -16,7 +16,7 @@
 #define PROGRAM_SUMMARY \
     "Portable Network Graphics optimizer"
 #define PROGRAM_VERSION \
-    "0.7.9"
+    "7.9.1"
 #define PROGRAM_COPYRIGHT \
     "Copyright (C) 2001-2025 Cosmin Truta and the Contributing Authors"
 #define PROGRAM_URI \

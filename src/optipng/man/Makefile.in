@@ -1,45 +1,37 @@
-.PHONY: all test check dist clean distclean install uninstall
+# Makefile.in
+
 .PRECIOUS: Makefile
 
 prefix = @prefix@
 mandir = @mandir@
 man1dir = @man1dir@
 
-all: optipng.man.txt optipng.man.ps optipng.man.pdf optipng.man.html
+.PHONY: all
+all: optipng.1
 
-optipng.man.txt: optipng.1
-	nroff -man -c -Tascii $< | col -b -x | uniq > $@
+optipng.1: optipng.1.adoc
+	a2x --format=manpage $<
 
-optipng.man.ps: optipng.1
-	groff -man -Tps -P-g $< > $@
-
-optipng.man.pdf: optipng.man.ps
-	ps2pdf $< $@
-
-optipng.man.html: optipng.1
-	groff -man -Thtml -P-l $< > $@
-
+.PHONY: test
 test:
 
+.PHONY: check
 check:
 
-dist: optipng.man.txt optipng.man.pdf optipng.man.html
-	cp -f -p optipng.man.txt ../../../doc/
-	cp -f -p optipng.man.pdf ../../../doc/
-	cp -f -p optipng.man.html ../../../doc/
+.PHONY: dist
+dist:
 
+.PHONY: clean
 clean:
-	rm -f optipng.man.txt
-	rm -f optipng.man.ps
-	rm -f optipng.man.pdf
-	rm -f optipng.man.html
 
-distclean: clean
-	rm -f Makefile
+.PHONY: distclean
+distclean:
 
+.PHONY: install
 install: optipng.1
 	mkdir -p $(DESTDIR)$(man1dir)
 	cp -f -p optipng.1 $(DESTDIR)$(man1dir)
 
+.PHONY: uninstall
 uninstall:
 	rm -f $(DESTDIR)$(man1dir)/optipng.1
