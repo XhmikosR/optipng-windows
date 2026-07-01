@@ -25,6 +25,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
+          config-file: ./.github/codeql/codeql-config.yml
           languages: "cpp"
           queries: security-extended,security-and-quality
 

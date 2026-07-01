@@ -1,54 +1,12 @@
 @echo off
 setlocal
 
-cd /d %~dp0
+cd /d "%~dp0"
 
-pushd src
-
-for %%G in (
-  "gifread"
-  "gifread\test\"
-  "minitiff"
-  "minitiff\test\"
-  "opngreduc"
-  "optipng"
-  "optipng\test\"
-  "pngxtern"
-  "pnmio"
-) do call :clean %%G
-
-popd
-
-pushd third_party
-
-for %%G in (
-  "cexcept"
-  "libpng"
-  "zlib"
-) do call :clean %%G
-
-popd
+if exist build rmdir /s /q build
+if %ERRORLEVEL% NEQ 0 goto end
 
 :end
 endlocal
-pause
-exit /b
-
-:clean
-pushd "%~1"
-
-for %%G in (
-  "*.lib"
-  "*.obj"
-  "*.pdb"
-  "*.exe"
-  "*.exp"
-  "*.dll"
-  "*.res"
-  "*.out"
-) do (
-  if exist "%%G" del "%%G"
-)
-
-popd
-exit /b 0
+if not defined CI pause
+exit /b %ERRORLEVEL%
