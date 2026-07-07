@@ -28,9 +28,6 @@ jobs:
           languages: "cpp"
           queries: security-extended,security-and-quality
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v3
-
       - name: Build
         run: CALL "build.bat"
         shell: cmd
